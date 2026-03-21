@@ -1,0 +1,29 @@
+## Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+*.xcworkspace
+!*.xcodeproj/project.xcworkspace/
+build/
+
+## macOS
+.DS_Store
+*.swp
+*~.nib
+
+## Models (too large for git)
+models/
+*.gguf
+
+## Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+
+## Misc
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.hmap
+*.xccheckout

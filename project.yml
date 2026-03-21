@@ -1,0 +1,33 @@
+name: Kalorientracker
+options:
+  bundleIdPrefix: com.philippschmid
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "26.3"
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: 6H94JXY7PL
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "6.0"
+
+targets:
+  Kalorientracker:
+    type: application
+    platform: iOS
+    sources:
+      - path: Kalorientracker
+    settings:
+      base:
+        INFOPLIST_KEY_NSCameraUsageDescription: "Kalorientracker benötigt Zugriff auf die Kamera, um dein Essen zu fotografieren und die Kalorien zu analysieren."
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Wähle ein Foto aus deiner Galerie zur Kalorienanalyse."
+        INFOPLIST_KEY_UILaunchScreen_Generation: true
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UIRequiresFullScreen: false
+        INFOPLIST_KEY_CFBundleDisplayName: "Kalorien"
+        GENERATE_INFOPLIST_FILE: true
+        CODE_SIGN_STYLE: Automatic
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SWIFT_STRICT_CONCURRENCY: complete

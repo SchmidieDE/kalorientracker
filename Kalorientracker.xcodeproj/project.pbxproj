@@ -1,0 +1,499 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		15C211C05CFEF8AFDF0168B3 /* DailyCalorieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E495921F8F10B4DC547B95 /* DailyCalorieChart.swift */; };
+		2658017517DF70186BBC296A /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E434795CB2BD97F6E4C23CBD /* GradientButton.swift */; };
+		2757D1A9EB078DD3CAC75393 /* ModelDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12DE4B2EA9D68D1640BBA396 /* ModelDownloadView.swift */; };
+		32772A983E392ADE04E93483 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B3030309D1678AC7A825D6 /* StatisticsView.swift */; };
+		3561E25F357D3FFB04EC6141 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6495CC9C40F99DF2082628A7 /* ProfileView.swift */; };
+		3FF4F928B9AF3D9252A0B945 /* FoodEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2FDAA88C9A226E5F406FD4A /* FoodEntry.swift */; };
+		54E59CAD3468EED48C93B53C /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE5712B6F95DEBB8C7A8841 /* UserProfile.swift */; };
+		568B715A28143DBE5D44B6F3 /* KalorientrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDED89DE02B71050169171D4 /* KalorientrackerApp.swift */; };
+		6F3DDABA89F30CC5AEAFA36F /* FoodDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A967018AB8A88339BFBACD53 /* FoodDetailSheet.swift */; };
+		7372F37E4CAD4A35FB698AB1 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE37FD8C63A980AFF0511DE /* TodayView.swift */; };
+		7B3C342F57AF0953150ADFA0 /* MacroBreakdownChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB51ECB785348760DE0109A /* MacroBreakdownChart.swift */; };
+		7CAB2114AB25ED2ED0A70D47 /* CalorieCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D09F55D5F598E4EC6D0114 /* CalorieCalculator.swift */; };
+		82BC34AB929F510FC2C05A84 /* AnalysisResultCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3665C4F6762CF0FA87B6FC /* AnalysisResultCard.swift */; };
+		85B9CAFC053BD92A4AD96430 /* GeminiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DA6DFFC778D4B2080138B /* GeminiService.swift */; };
+		9539BA5ADEB80BC71DAC4B5C /* FoodAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 584F44EEF7D1999866322A62 /* FoodAnalyzer.swift */; };
+		A2637EA1A72A1B971CA9A9C0 /* CalorieProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB72FAA32CD5CA5FBA5F7A1F /* CalorieProgressRing.swift */; };
+		B1A2BA8678763824AADC7A1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3115C6DF288D89B8962CE709 /* Assets.xcassets */; };
+		B1F2A04ABC4B794043C7DD07 /* NutritionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAEF80A4B909B87AD626AB2 /* NutritionResult.swift */; };
+		B6E394D5693AEB3AB2CEAC4D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17DE1E3F14D6665562A5B6F /* ContentView.swift */; };
+		B7FF968C4D5003C577D39943 /* FoodEntryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C86DA50F9C50353FA58B8B8 /* FoodEntryRow.swift */; };
+		BB3F2495EE1B0D92CE78E0A9 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB62296B414BDD585CB9BB6 /* GlassCard.swift */; };
+		BC8578FEE7E08097D8847950 /* PhotoReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2670243DB740FF651B2B54DD /* PhotoReviewView.swift */; };
+		C5F31DD6A737BBA7B4FA0AE4 /* ModelDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501FFA2FC8631AEFB0E8AFD8 /* ModelDownloadManager.swift */; };
+		DEBFBF16FB74D930B8BF9316 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18D2D7BC9516B41B579AE89 /* Constants.swift */; };
+		FAE3D599DC63DF6F982DCD45 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759FF3B11191E9BF46369EF0 /* CameraView.swift */; };
+		FF7BEF7409451E80059ADC0E /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260AD8D39C6A4B95F8CA547E /* Extensions.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		12DE4B2EA9D68D1640BBA396 /* ModelDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadView.swift; sourceTree = "<group>"; };
+		1FB51ECB785348760DE0109A /* MacroBreakdownChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroBreakdownChart.swift; sourceTree = "<group>"; };
+		260AD8D39C6A4B95F8CA547E /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		2670243DB740FF651B2B54DD /* PhotoReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoReviewView.swift; sourceTree = "<group>"; };
+		2EB62296B414BDD585CB9BB6 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
+		3115C6DF288D89B8962CE709 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		501FFA2FC8631AEFB0E8AFD8 /* ModelDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadManager.swift; sourceTree = "<group>"; };
+		584F44EEF7D1999866322A62 /* FoodAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodAnalyzer.swift; sourceTree = "<group>"; };
+		6495CC9C40F99DF2082628A7 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		759FF3B11191E9BF46369EF0 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		7EDE9A9A072F940A62610D42 /* Kalorientracker.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Kalorientracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		96D09F55D5F598E4EC6D0114 /* CalorieCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalorieCalculator.swift; sourceTree = "<group>"; };
+		9C86DA50F9C50353FA58B8B8 /* FoodEntryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodEntryRow.swift; sourceTree = "<group>"; };
+		9EE37FD8C63A980AFF0511DE /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		A6E495921F8F10B4DC547B95 /* DailyCalorieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCalorieChart.swift; sourceTree = "<group>"; };
+		A967018AB8A88339BFBACD53 /* FoodDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDetailSheet.swift; sourceTree = "<group>"; };
+		B17DE1E3F14D6665562A5B6F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B2FDAA88C9A226E5F406FD4A /* FoodEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodEntry.swift; sourceTree = "<group>"; };
+		BEAEF80A4B909B87AD626AB2 /* NutritionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionResult.swift; sourceTree = "<group>"; };
+		D0B3030309D1678AC7A825D6 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		DB72FAA32CD5CA5FBA5F7A1F /* CalorieProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalorieProgressRing.swift; sourceTree = "<group>"; };
+		DDED89DE02B71050169171D4 /* KalorientrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalorientrackerApp.swift; sourceTree = "<group>"; };
+		E18D2D7BC9516B41B579AE89 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		E42DA6DFFC778D4B2080138B /* GeminiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiService.swift; sourceTree = "<group>"; };
+		E434795CB2BD97F6E4C23CBD /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
+		FD3665C4F6762CF0FA87B6FC /* AnalysisResultCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisResultCard.swift; sourceTree = "<group>"; };
+		FDE5712B6F95DEBB8C7A8841 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0810BFA4CD022A598D311AC7 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				96D09F55D5F598E4EC6D0114 /* CalorieCalculator.swift */,
+				584F44EEF7D1999866322A62 /* FoodAnalyzer.swift */,
+				E42DA6DFFC778D4B2080138B /* GeminiService.swift */,
+				501FFA2FC8631AEFB0E8AFD8 /* ModelDownloadManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		1ECB8F3C0E62F668673D7519 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B2FDAA88C9A226E5F406FD4A /* FoodEntry.swift */,
+				BEAEF80A4B909B87AD626AB2 /* NutritionResult.swift */,
+				FDE5712B6F95DEBB8C7A8841 /* UserProfile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		29E145E66604B1EBA5E5C5B1 /* Kalorientracker */ = {
+			isa = PBXGroup;
+			children = (
+				B17DE1E3F14D6665562A5B6F /* ContentView.swift */,
+				DDED89DE02B71050169171D4 /* KalorientrackerApp.swift */,
+				1ECB8F3C0E62F668673D7519 /* Models */,
+				5667ED6A285B11C422BDD22E /* Resources */,
+				0810BFA4CD022A598D311AC7 /* Services */,
+				4CC4620084D3D684C530FD46 /* Utilities */,
+				8023BF2D3B7E5E06F7928222 /* Views */,
+			);
+			path = Kalorientracker;
+			sourceTree = "<group>";
+		};
+		4CC4620084D3D684C530FD46 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				E18D2D7BC9516B41B579AE89 /* Constants.swift */,
+				260AD8D39C6A4B95F8CA547E /* Extensions.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		5667ED6A285B11C422BDD22E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3115C6DF288D89B8962CE709 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		8023BF2D3B7E5E06F7928222 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9F57BB5756663512420B56A6 /* Camera */,
+				D837DFDB6D437D1D50420560 /* Components */,
+				BEBD53328266636C3933D3DB /* Profile */,
+				9724F140701FE325F8C1BC81 /* Statistics */,
+				CC1FD1C4C410FEBC26155BA1 /* Today */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		8612C05EFC6A31F2544C1D61 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7EDE9A9A072F940A62610D42 /* Kalorientracker.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9724F140701FE325F8C1BC81 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				A6E495921F8F10B4DC547B95 /* DailyCalorieChart.swift */,
+				1FB51ECB785348760DE0109A /* MacroBreakdownChart.swift */,
+				D0B3030309D1678AC7A825D6 /* StatisticsView.swift */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
+		9F57BB5756663512420B56A6 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				FD3665C4F6762CF0FA87B6FC /* AnalysisResultCard.swift */,
+				759FF3B11191E9BF46369EF0 /* CameraView.swift */,
+				2670243DB740FF651B2B54DD /* PhotoReviewView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		BEBD53328266636C3933D3DB /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				6495CC9C40F99DF2082628A7 /* ProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		C309D4AFC8E6E41AEE7DF815 = {
+			isa = PBXGroup;
+			children = (
+				29E145E66604B1EBA5E5C5B1 /* Kalorientracker */,
+				8612C05EFC6A31F2544C1D61 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CC1FD1C4C410FEBC26155BA1 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				DB72FAA32CD5CA5FBA5F7A1F /* CalorieProgressRing.swift */,
+				A967018AB8A88339BFBACD53 /* FoodDetailSheet.swift */,
+				9C86DA50F9C50353FA58B8B8 /* FoodEntryRow.swift */,
+				9EE37FD8C63A980AFF0511DE /* TodayView.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
+		D837DFDB6D437D1D50420560 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				2EB62296B414BDD585CB9BB6 /* GlassCard.swift */,
+				E434795CB2BD97F6E4C23CBD /* GradientButton.swift */,
+				12DE4B2EA9D68D1640BBA396 /* ModelDownloadView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1456CBC3B3D3BFEBCB4DC965 /* Kalorientracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 89B248411A4C5AD201E5C64C /* Build configuration list for PBXNativeTarget "Kalorientracker" */;
+			buildPhases = (
+				8E2417300CCB049B92484764 /* Sources */,
+				AE618DB7E93B373F389C7BA7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Kalorientracker;
+			packageProductDependencies = (
+			);
+			productName = Kalorientracker;
+			productReference = 7EDE9A9A072F940A62610D42 /* Kalorientracker.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BAFE3C90AB7E78CB9DFA6AA8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					1456CBC3B3D3BFEBCB4DC965 = {
+						DevelopmentTeam = 6H94JXY7PL;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 612715852D9A7FDFEA1CC6E9 /* Build configuration list for PBXProject "Kalorientracker" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = C309D4AFC8E6E41AEE7DF815;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8612C05EFC6A31F2544C1D61 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1456CBC3B3D3BFEBCB4DC965 /* Kalorientracker */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AE618DB7E93B373F389C7BA7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1A2BA8678763824AADC7A1D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8E2417300CCB049B92484764 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82BC34AB929F510FC2C05A84 /* AnalysisResultCard.swift in Sources */,
+				7CAB2114AB25ED2ED0A70D47 /* CalorieCalculator.swift in Sources */,
+				A2637EA1A72A1B971CA9A9C0 /* CalorieProgressRing.swift in Sources */,
+				FAE3D599DC63DF6F982DCD45 /* CameraView.swift in Sources */,
+				DEBFBF16FB74D930B8BF9316 /* Constants.swift in Sources */,
+				B6E394D5693AEB3AB2CEAC4D /* ContentView.swift in Sources */,
+				15C211C05CFEF8AFDF0168B3 /* DailyCalorieChart.swift in Sources */,
+				FF7BEF7409451E80059ADC0E /* Extensions.swift in Sources */,
+				9539BA5ADEB80BC71DAC4B5C /* FoodAnalyzer.swift in Sources */,
+				6F3DDABA89F30CC5AEAFA36F /* FoodDetailSheet.swift in Sources */,
+				3FF4F928B9AF3D9252A0B945 /* FoodEntry.swift in Sources */,
+				B7FF968C4D5003C577D39943 /* FoodEntryRow.swift in Sources */,
+				85B9CAFC053BD92A4AD96430 /* GeminiService.swift in Sources */,
+				BB3F2495EE1B0D92CE78E0A9 /* GlassCard.swift in Sources */,
+				2658017517DF70186BBC296A /* GradientButton.swift in Sources */,
+				568B715A28143DBE5D44B6F3 /* KalorientrackerApp.swift in Sources */,
+				7B3C342F57AF0953150ADFA0 /* MacroBreakdownChart.swift in Sources */,
+				C5F31DD6A737BBA7B4FA0AE4 /* ModelDownloadManager.swift in Sources */,
+				2757D1A9EB078DD3CAC75393 /* ModelDownloadView.swift in Sources */,
+				B1F2A04ABC4B794043C7DD07 /* NutritionResult.swift in Sources */,
+				BC8578FEE7E08097D8847950 /* PhotoReviewView.swift in Sources */,
+				3561E25F357D3FFB04EC6141 /* ProfileView.swift in Sources */,
+				32772A983E392ADE04E93483 /* StatisticsView.swift in Sources */,
+				7372F37E4CAD4A35FB698AB1 /* TodayView.swift in Sources */,
+				54E59CAD3468EED48C93B53C /* UserProfile.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		3B7DE7F8F3DCA21429996064 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Kalorien;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Kalorientracker benötigt Zugriff auf die Kamera, um dein Essen zu fotografieren und die Kalorien zu analysieren.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Wähle ein Foto aus deiner Galerie zur Kalorienanalyse.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.philippschmid.Kalorientracker;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6A7D6F02CF873BF022AA57D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6H94JXY7PL;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		C75177E7A3A74F3A9D4889F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6H94JXY7PL;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		CF5656CAD0B2BB69EF2509A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Kalorien;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Kalorientracker benötigt Zugriff auf die Kamera, um dein Essen zu fotografieren und die Kalorien zu analysieren.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Wähle ein Foto aus deiner Galerie zur Kalorienanalyse.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.philippschmid.Kalorientracker;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		612715852D9A7FDFEA1CC6E9 /* Build configuration list for PBXProject "Kalorientracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C75177E7A3A74F3A9D4889F8 /* Debug */,
+				6A7D6F02CF873BF022AA57D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		89B248411A4C5AD201E5C64C /* Build configuration list for PBXNativeTarget "Kalorientracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CF5656CAD0B2BB69EF2509A4 /* Debug */,
+				3B7DE7F8F3DCA21429996064 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BAFE3C90AB7E78CB9DFA6AA8 /* Project object */;
+}

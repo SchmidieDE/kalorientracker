@@ -1,0 +1,43 @@
+import SwiftUI
+
+enum Constants {
+    static let geminiAPIKey = "AIzaSyCHeKK7bSeJywlmxaiK4xmFitefslSmjSY"
+    static let geminiModel = "gemini-2.5-flash"  // Update to newer model when available
+    static let geminiBaseURL = "https://generativelanguage.googleapis.com/v1beta/models"
+
+    // GGUF model for on-device inference
+    static let localModelName = "Qwen3-VL-2B-Instruct-Q4_K_M.gguf"
+    static let localModelURL = "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/resolve/main/Qwen3-VL-2B-Instruct-Q4_K_M.gguf"
+    static let localModelSize: Int64 = 1_100_000_000 // ~1.1GB
+
+    enum Colors {
+        static let background = Color(hex: 0x0A0E1A)
+        static let surface = Color(hex: 0x141929)
+        static let gradientStart = Color(hex: 0x00D4AA)
+        static let gradientEnd = Color(hex: 0x00B4D8)
+        static let success = Color(hex: 0x00D4AA)
+        static let warning = Color(hex: 0xFFB347)
+        static let danger = Color(hex: 0xFF6B6B)
+        static let proteinColor = Color(hex: 0x6C9FFF)
+        static let carbsColor = Color(hex: 0xFFB347)
+        static let fatColor = Color(hex: 0xFF6B9D)
+        static let textSecondary = Color(hex: 0x8B95A8)
+        static let glassBorder = Color.white.opacity(0.15)
+
+        static var accentGradient: LinearGradient {
+            LinearGradient(colors: [gradientStart, gradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
+    }
+}
+
+extension Color {
+    init(hex: UInt, opacity: Double = 1.0) {
+        self.init(
+            .sRGB,
+            red: Double((hex >> 16) & 0xFF) / 255.0,
+            green: Double((hex >> 8) & 0xFF) / 255.0,
+            blue: Double(hex & 0xFF) / 255.0,
+            opacity: opacity
+        )
+    }
+}
