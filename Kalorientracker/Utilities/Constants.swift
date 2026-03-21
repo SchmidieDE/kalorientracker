@@ -5,12 +5,12 @@ enum Constants {
     static let geminiModel = "gemini-2.5-flash"  // Update to newer model when available
     static let geminiBaseURL = "https://generativelanguage.googleapis.com/v1beta/models"
 
-    // GGUF model for on-device inference (Qwen3.5 2B Vision)
-    static let localModelName = "Qwen3.5-2B.Q4_K_M.gguf"
-    static let localMmprojName = "Qwen3.5-2B-mmproj.gguf"
-    static let localModelURL = "https://huggingface.co/bjivanovich/Qwen3.5-2B-Vision-GGUF/resolve/main/Qwen3.5-2B.Q4_K_M.gguf"
-    static let localMmprojURL = "https://huggingface.co/bjivanovich/Qwen3.5-2B-Vision-GGUF/resolve/main/Qwen3.5-2B.BF16-mmproj.gguf"
-    static let localModelSize: Int64 = 1_700_000_000 // ~1.7GB
+    // GGUF model for on-device inference (Qwen3.5 4B Vision — best for iPhone)
+    static let localModelName = "Qwen3.5-4B.Q4_K_M.gguf"
+    static let localMmprojName = "Qwen3.5-4B-mmproj.gguf"
+    static let localModelURL = "https://huggingface.co/bjivanovich/Qwen3.5-4B-Vision-GGUF/resolve/main/Qwen3.5-4B.Q4_K_M.gguf"
+    static let localMmprojURL = "https://huggingface.co/bjivanovich/Qwen3.5-4B-Vision-GGUF/resolve/main/Qwen3.5-4B.BF16-mmproj.gguf"
+    static let localModelSize: Int64 = 2_800_000_000 // ~2.8GB
 
     enum Colors {
         static let background = Color(hex: 0x0A0E1A)
