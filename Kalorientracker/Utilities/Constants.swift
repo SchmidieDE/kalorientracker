@@ -1,9 +1,7 @@
 import SwiftUI
 
 enum Constants {
-    static let geminiAPIKey = "AIzaSyCHeKK7bSeJywlmxaiK4xmFitefslSmjSY"
-    static let geminiModel = "gemini-2.5-flash"  // Update to newer model when available
-    static let geminiBaseURL = "https://generativelanguage.googleapis.com/v1beta/models"
+    static let apiBaseURL = "https://api.kalorientracker.webgantic.com"
 
     // GGUF model for on-device inference (Qwen3.5 4B Vision — best for iPhone)
     static let localModelName = "Qwen3.5-4B.Q4_K_M.gguf"

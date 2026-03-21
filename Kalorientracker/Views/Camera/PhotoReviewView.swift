@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct PhotoReviewView: View {
     let image: UIImage
@@ -81,6 +82,8 @@ struct PhotoReviewView: View {
                     .padding()
                 } else if let result {
                     AnalysisResultCard(result: result, onSave: {
+                        let impact = UINotificationFeedbackGenerator()
+                        impact.notificationOccurred(.success)
                         onSave(result)
                     }, onDiscard: {
                         dismiss()
@@ -90,6 +93,7 @@ struct PhotoReviewView: View {
                 }
             }
         }
+        .interactiveDismissDisabled(analyzer.isAnalyzing)
         .onAppear {
             if !hasStarted {
                 hasStarted = true
@@ -107,5 +111,3 @@ struct PhotoReviewView: View {
         }
     }
 }
-
-import SwiftData

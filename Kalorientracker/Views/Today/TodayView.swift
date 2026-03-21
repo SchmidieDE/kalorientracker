@@ -15,8 +15,9 @@ struct TodayView: View {
     @Query private var profiles: [UserProfile]
     @StateObject private var analyzer = FoodAnalyzer()
     @State private var showCamera = false
-    @State private var showResult = false
     @State private var capturedImage: UIImage?
+    @State private var showResult = false
+    @State private var selectedEntry: FoodEntry?
     @State private var pulseAnimation = false
 
     private var profile: UserProfile? { profiles.first }
@@ -108,8 +109,13 @@ struct TodayView: View {
                             ForEach(todayEntries) { entry in
                                 FoodEntryRow(entry: entry)
                                     .padding(.horizontal)
+                                    .onTapGesture {
+                                        selectedEntry = entry
+                                    }
                                     .contextMenu {
                                         Button(role: .destructive) {
+                                            let haptic = UINotificationFeedbackGenerator()
+                                            haptic.notificationOccurred(.warning)
                                             withAnimation {
                                                 modelContext.delete(entry)
                                             }
@@ -128,6 +134,8 @@ struct TodayView: View {
             VStack {
                 Spacer()
                 Button {
+                    let impact = UIImpactFeedbackGenerator(style: .medium)
+                    impact.impactOccurred()
                     showCamera = true
                 } label: {
                     ZStack {
@@ -150,13 +158,27 @@ struct TodayView: View {
             }
         }
         .fullScreenCover(isPresented: $showCamera) {
-            CameraView { image in
-                capturedImage = image
-                showCamera = false
-                showResult = true
+            CameraView(
+                onCapture: { image in
+                    capturedImage = image
+                    showCamera = false
+                },
+                onCancel: {
+                    showCamera = false
+                }
+            )
+        }
+        .onChange(of: showCamera) { _, isShowing in
+            // After camera dismisses, show result sheet if we have an image
+            if !isShowing && capturedImage != nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    showResult = true
+                }
             }
         }
-        .sheet(isPresented: $showResult) {
+        .sheet(isPresented: $showResult, onDismiss: {
+            capturedImage = nil
+        }) {
             if let image = capturedImage {
                 PhotoReviewView(image: image, analyzer: analyzer) { result in
                     let entry = FoodEntry(
@@ -175,6 +197,9 @@ struct TodayView: View {
                     showResult = false
                 }
             }
+        }
+        .sheet(item: $selectedEntry) { entry in
+            FoodDetailSheet(entry: entry)
         }
     }
 }

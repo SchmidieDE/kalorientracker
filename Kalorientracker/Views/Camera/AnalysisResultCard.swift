@@ -30,9 +30,10 @@ struct AnalysisResultCard: View {
 
             // Macro bars
             VStack(spacing: 12) {
-                MacroBar(label: "Protein", value: result.protein, color: Constants.Colors.proteinColor, maxValue: max(result.protein, max(result.carbs, result.fat)))
-                MacroBar(label: "Kohlenhydrate", value: result.carbs, color: Constants.Colors.carbsColor, maxValue: max(result.protein, max(result.carbs, result.fat)))
-                MacroBar(label: "Fett", value: result.fat, color: Constants.Colors.fatColor, maxValue: max(result.protein, max(result.carbs, result.fat)))
+                let maxVal = max(result.protein, max(result.carbs, result.fat))
+                MacroBar(label: "Protein", value: result.protein, color: Constants.Colors.proteinColor, maxValue: max(maxVal, 1))
+                MacroBar(label: "Kohlenhydrate", value: result.carbs, color: Constants.Colors.carbsColor, maxValue: max(maxVal, 1))
+                MacroBar(label: "Fett", value: result.fat, color: Constants.Colors.fatColor, maxValue: max(maxVal, 1))
             }
 
             // Portion
@@ -48,7 +49,7 @@ struct AnalysisResultCard: View {
             HStack(spacing: 4) {
                 ForEach(0..<5) { i in
                     Circle()
-                        .fill(Double(i) / 5.0 < result.confidence ? Constants.Colors.gradientStart : Constants.Colors.surface)
+                        .fill(Double(i) < (result.confidence * 5.0) ? Constants.Colors.gradientStart : Constants.Colors.surface)
                         .frame(width: 8, height: 8)
                 }
                 Text(result.confidence > 0.8 ? "Sehr sicher" : result.confidence > 0.5 ? "Sicher" : "Schätzung")
@@ -75,8 +76,6 @@ struct AnalysisResultCard: View {
             // Action buttons
             VStack(spacing: 10) {
                 GradientButton("Speichern", icon: "checkmark") {
-                    let impact = UIImpactFeedbackGenerator(style: .medium)
-                    impact.impactOccurred()
                     onSave()
                 }
                 SecondaryButton(title: "Verwerfen") {
@@ -112,7 +111,7 @@ struct MacroBar: View {
 
                     RoundedRectangle(cornerRadius: 4)
                         .fill(color)
-                        .frame(width: geo.size.width * ratio)
+                        .frame(width: max(geo.size.width * ratio, 0))
                 }
             }
             .frame(height: 8)

@@ -41,19 +41,23 @@ final class FoodAnalyzer: ObservableObject {
                 result = try await geminiService.analyze(image: image)
 
             case .localOnly:
-                // TODO: Implement on-device inference
                 analysisSource = .onDevice
-                lastError = "On-Device Modell wird noch eingerichtet..."
-                return nil
+                // On-device inference placeholder — Gemini as fallback
+                if hasInternet {
+                    analysisSource = .cloud
+                    result = try await geminiService.analyze(image: image)
+                } else {
+                    lastError = "On-Device Modell wird noch integriert. Bitte verbinde dich mit dem Internet."
+                    return nil
+                }
 
             case .automatic:
                 if hasInternet {
                     analysisSource = .cloud
                     result = try await geminiService.analyze(image: image)
                 } else {
-                    // TODO: Fall back to on-device
                     analysisSource = .onDevice
-                    lastError = "Kein Internet. On-Device Modell wird noch eingerichtet..."
+                    lastError = "Kein Internet verfügbar. On-Device Analyse wird noch integriert."
                     return nil
                 }
             }
