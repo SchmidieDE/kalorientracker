@@ -20,7 +20,7 @@ final class GeminiService: Sendable {
         }
     }
 
-    func analyze(image: UIImage) async throws -> NutritionResult {
+    func analyze(image: UIImage, authToken: String? = nil) async throws -> NutritionResult {
         guard let imageData = image.jpegCompressed(quality: 0.7, maxDimension: 1024) else {
             throw GeminiError.imageTooLarge
         }
@@ -31,6 +31,9 @@ final class GeminiService: Sendable {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let authToken {
+            request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
+        }
         request.timeoutInterval = 30
 
         let body: [String: String] = ["image": base64Image]

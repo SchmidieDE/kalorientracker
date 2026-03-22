@@ -12,7 +12,8 @@ struct PhotoReviewView: View {
     @State private var hasStarted = false
 
     private var profile: UserProfile? { profiles.first }
-    private var aiMode: AIMode { profile?.aiMode ?? .automatic }
+    @EnvironmentObject var authManager: AuthManager
+    private var aiMode: AIMode { profile?.aiMode ?? .cloudOnly }
 
     var body: some View {
         ZStack {
@@ -104,7 +105,7 @@ struct PhotoReviewView: View {
 
     private func startAnalysis() {
         Task {
-            let res = await analyzer.analyze(image: image, aiMode: aiMode)
+            let res = await analyzer.analyze(image: image, aiMode: aiMode, authToken: authManager.accessToken)
             withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
                 result = res
             }

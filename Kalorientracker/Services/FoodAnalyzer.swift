@@ -25,7 +25,7 @@ final class FoodAnalyzer: ObservableObject {
         monitor.cancel()
     }
 
-    func analyze(image: UIImage, aiMode: AIMode) async -> NutritionResult? {
+    func analyze(image: UIImage, aiMode: AIMode, authToken: String? = nil) async -> NutritionResult? {
         isAnalyzing = true
         lastError = nil
         lastResult = nil
@@ -37,27 +37,21 @@ final class FoodAnalyzer: ObservableObject {
 
             switch aiMode {
             case .cloudOnly:
+                if authToken == nil {
+                    lastError = "Bitte melde dich an, um Cloud-AI zu nutzen"
+                    return nil
+                }
                 analysisSource = .cloud
-                result = try await geminiService.analyze(image: image)
+                result = try await geminiService.analyze(image: image, authToken: authToken)
 
             case .localOnly:
                 analysisSource = .onDevice
-                // On-device inference placeholder — Gemini as fallback
                 if hasInternet {
+                    // Fallback to cloud while on-device is not ready
                     analysisSource = .cloud
-                    result = try await geminiService.analyze(image: image)
+                    result = try await geminiService.analyze(image: image, authToken: authToken)
                 } else {
                     lastError = "On-Device Modell wird noch integriert. Bitte verbinde dich mit dem Internet."
-                    return nil
-                }
-
-            case .automatic:
-                if hasInternet {
-                    analysisSource = .cloud
-                    result = try await geminiService.analyze(image: image)
-                } else {
-                    analysisSource = .onDevice
-                    lastError = "Kein Internet verfügbar. On-Device Analyse wird noch integriert."
                     return nil
                 }
             }

@@ -1,7 +1,9 @@
 import SwiftUI
 
 enum Constants {
-    static let apiBaseURL = "https://api.kalorientracker.webgantic.com"
+    static let apiBaseURL = "https://kalorientracker.webgantic.com"
+    static let supabaseURL = "https://supabase-kalorientracker.webgantic.com"
+    static let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcwNzM2Njk4LCJleHAiOjIwODYwOTY2OTh9.iDTVeUvL3pd0vLXWIgUFi1g5M5wDyxEF6fljvYuZC18"
 
     // GGUF model for on-device inference (Qwen3.5 4B Vision — best for iPhone)
     static let localModelName = "Qwen3.5-4B.Q4_K_M.gguf"

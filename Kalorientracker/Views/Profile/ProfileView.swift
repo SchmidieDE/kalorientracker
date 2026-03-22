@@ -1,10 +1,12 @@
 import SwiftUI
 import SwiftData
+import AuthenticationServices
 
 struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var profiles: [UserProfile]
     @StateObject private var downloadManager = ModelDownloadManager()
+    @EnvironmentObject var authManager: AuthManager
 
     private var profile: UserProfile? { profiles.first }
 
@@ -22,6 +24,10 @@ struct ProfileView: View {
                         Spacer()
                     }
                     .padding(.horizontal)
+
+                    // Account section
+                    accountSection
+                        .padding(.horizontal)
 
                     if let profile {
                         profileContent(profile: profile)
@@ -42,9 +48,95 @@ struct ProfileView: View {
         }
     }
 
+    // MARK: - Account Section
+
+    @ViewBuilder
+    private var accountSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Account")
+                .font(.headline)
+                .foregroundStyle(.white)
+
+            if let user = authManager.user {
+                // Logged in
+                HStack(spacing: 12) {
+                    // Avatar circle
+                    ZStack {
+                        Circle()
+                            .fill(Constants.Colors.gradientStart.opacity(0.2))
+                            .frame(width: 44, height: 44)
+                        Text(String((user.displayName?.first ?? user.email.first) ?? "?").uppercased())
+                            .font(.title3.bold())
+                            .foregroundStyle(Constants.Colors.gradientStart)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        if let name = user.displayName, !name.isEmpty {
+                            Text(name)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(.white)
+                        }
+                        Text(user.email)
+                            .font(.caption)
+                            .foregroundStyle(Constants.Colors.textSecondary)
+                    }
+
+                    Spacer()
+                }
+
+                Button {
+                    authManager.signOut()
+                } label: {
+                    HStack {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                        Text("Abmelden")
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(Constants.Colors.textSecondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Constants.Colors.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+
+            } else {
+                // Not logged in
+                Text("Melde dich an, um Cloud-AI zu nutzen und deine Daten zu sichern.")
+                    .font(.caption)
+                    .foregroundStyle(Constants.Colors.textSecondary)
+
+                if authManager.isLoading {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .tint(Constants.Colors.gradientStart)
+                        Spacer()
+                    }
+                } else {
+                    SignInWithAppleButton(.signIn) { request in
+                        request.requestedScopes = [.fullName, .email]
+                    } onCompletion: { result in
+                        authManager.handleAppleSignIn(result: result)
+                    }
+                    .signInWithAppleButtonStyle(.white)
+                    .frame(height: 50)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
+
+                if let error = authManager.error {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(Constants.Colors.danger)
+                }
+            }
+        }
+        .padding(20)
+        .glassCard()
+    }
+
     @ViewBuilder
     private func profileContent(profile: UserProfile) -> some View {
-        // AI Mode
+        // AI Mode — only Cloud and On-Device
         VStack(alignment: .leading, spacing: 12) {
             Text("AI Modus")
                 .font(.headline)
@@ -52,11 +144,15 @@ struct ProfileView: View {
 
             HStack(spacing: 8) {
                 ForEach(AIMode.allCases, id: \.self) { mode in
+                    let needsLogin = mode == .cloudOnly && !authManager.isLoggedIn
+
                     Button {
-                        let impact = UIImpactFeedbackGenerator(style: .light)
-                        impact.impactOccurred()
-                        withAnimation {
-                            profile.aiMode = mode
+                        if !needsLogin {
+                            let impact = UIImpactFeedbackGenerator(style: .light)
+                            impact.impactOccurred()
+                            withAnimation {
+                                profile.aiMode = mode
+                            }
                         }
                     } label: {
                         VStack(spacing: 6) {
@@ -64,10 +160,19 @@ struct ProfileView: View {
                                 .font(.title3)
                             Text(mode.label)
                                 .font(.caption.weight(.medium))
+                            if needsLogin {
+                                Text("Login nötig")
+                                    .font(.system(size: 9))
+                                    .foregroundStyle(Constants.Colors.warning.opacity(0.7))
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .foregroundStyle(profile.aiMode == mode ? .white : Constants.Colors.textSecondary)
+                        .foregroundStyle(
+                            profile.aiMode == mode ? .white :
+                            needsLogin ? Constants.Colors.textSecondary.opacity(0.4) :
+                            Constants.Colors.textSecondary
+                        )
                         .background(
                             profile.aiMode == mode
                                 ? AnyShapeStyle(Constants.Colors.accentGradient)
