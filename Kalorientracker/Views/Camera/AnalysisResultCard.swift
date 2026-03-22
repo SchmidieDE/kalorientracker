@@ -2,8 +2,10 @@ import SwiftUI
 
 struct AnalysisResultCard: View {
     let result: NutritionResult
-    let onSave: () -> Void
+    let onSave: (MealCategory) -> Void
     let onDiscard: () -> Void
+
+    @State private var selectedMeal: MealCategory = MealCategory.fromCurrentTime()
 
     var body: some View {
         VStack(spacing: 20) {
@@ -73,10 +75,31 @@ struct AnalysisResultCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
 
+            // Meal category picker
+            HStack(spacing: 6) {
+                ForEach(MealCategory.allCases) { cat in
+                    Button {
+                        selectedMeal = cat
+                    } label: {
+                        VStack(spacing: 3) {
+                            Image(systemName: cat.icon)
+                                .font(.caption2)
+                            Text(cat.label)
+                                .font(.system(size: 9, weight: .medium))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(selectedMeal == cat ? .white : Constants.Colors.textSecondary)
+                        .background(selectedMeal == cat ? AnyShapeStyle(Constants.Colors.accentGradient) : AnyShapeStyle(Constants.Colors.surface))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+            }
+
             // Action buttons
             VStack(spacing: 10) {
                 GradientButton("Speichern", icon: "checkmark") {
-                    onSave()
+                    onSave(selectedMeal)
                 }
                 SecondaryButton(title: "Verwerfen") {
                     onDiscard()

@@ -9,13 +9,18 @@
 /* Begin PBXBuildFile section */
 		15C211C05CFEF8AFDF0168B3 /* DailyCalorieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E495921F8F10B4DC547B95 /* DailyCalorieChart.swift */; };
 		2658017517DF70186BBC296A /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E434795CB2BD97F6E4C23CBD /* GradientButton.swift */; };
+		26AD227D4757E18A04AEC771 /* FavoritesSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089CBA1FC5631EF055B48A5E /* FavoritesSheet.swift */; };
 		2757D1A9EB078DD3CAC75393 /* ModelDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12DE4B2EA9D68D1640BBA396 /* ModelDownloadView.swift */; };
+		2E735C268C4AC841F29FCF1A /* MealCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9576F30627FB01B1888FEB3 /* MealCategory.swift */; };
 		32772A983E392ADE04E93483 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B3030309D1678AC7A825D6 /* StatisticsView.swift */; };
 		3561E25F357D3FFB04EC6141 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6495CC9C40F99DF2082628A7 /* ProfileView.swift */; };
+		390533B144F8D67861EE3F5A /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B741B3B30A6420EFC63A136 /* ToastView.swift */; };
 		3FF4F928B9AF3D9252A0B945 /* FoodEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2FDAA88C9A226E5F406FD4A /* FoodEntry.swift */; };
+		53052296178BCB07B6CE4C57 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA89079A88F09484ED2BA8C /* OnboardingView.swift */; };
 		54E59CAD3468EED48C93B53C /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE5712B6F95DEBB8C7A8841 /* UserProfile.swift */; };
 		568B715A28143DBE5D44B6F3 /* KalorientrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDED89DE02B71050169171D4 /* KalorientrackerApp.swift */; };
 		6F3DDABA89F30CC5AEAFA36F /* FoodDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A967018AB8A88339BFBACD53 /* FoodDetailSheet.swift */; };
+		72588C2E14E362E3F09236CD /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C101A574FB3FCE55299DDD2E /* AuthManager.swift */; };
 		7372F37E4CAD4A35FB698AB1 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE37FD8C63A980AFF0511DE /* TodayView.swift */; };
 		7B3C342F57AF0953150ADFA0 /* MacroBreakdownChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB51ECB785348760DE0109A /* MacroBreakdownChart.swift */; };
 		7CAB2114AB25ED2ED0A70D47 /* CalorieCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D09F55D5F598E4EC6D0114 /* CalorieCalculator.swift */; };
@@ -30,18 +35,23 @@
 		BB3F2495EE1B0D92CE78E0A9 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB62296B414BDD585CB9BB6 /* GlassCard.swift */; };
 		BC8578FEE7E08097D8847950 /* PhotoReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2670243DB740FF651B2B54DD /* PhotoReviewView.swift */; };
 		C5F31DD6A737BBA7B4FA0AE4 /* ModelDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501FFA2FC8631AEFB0E8AFD8 /* ModelDownloadManager.swift */; };
+		CD5564EB00D906098E07E861 /* AddFoodSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E68E278CE4BBA41F6D137 /* AddFoodSheet.swift */; };
+		D2B6045911731F9EC906B6C3 /* EditFoodEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA56A6F61DC5D4B5F7258B67 /* EditFoodEntrySheet.swift */; };
 		DEBFBF16FB74D930B8BF9316 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18D2D7BC9516B41B579AE89 /* Constants.swift */; };
+		E0A19B19C0A047274D341FF7 /* ManualFoodEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF451DA8D23010468596F80B /* ManualFoodEntrySheet.swift */; };
 		FAE3D599DC63DF6F982DCD45 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759FF3B11191E9BF46369EF0 /* CameraView.swift */; };
 		FF7BEF7409451E80059ADC0E /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260AD8D39C6A4B95F8CA547E /* Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		089CBA1FC5631EF055B48A5E /* FavoritesSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesSheet.swift; sourceTree = "<group>"; };
 		12DE4B2EA9D68D1640BBA396 /* ModelDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadView.swift; sourceTree = "<group>"; };
 		1FB51ECB785348760DE0109A /* MacroBreakdownChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroBreakdownChart.swift; sourceTree = "<group>"; };
 		260AD8D39C6A4B95F8CA547E /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		2670243DB740FF651B2B54DD /* PhotoReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoReviewView.swift; sourceTree = "<group>"; };
 		2EB62296B414BDD585CB9BB6 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
 		3115C6DF288D89B8962CE709 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4B741B3B30A6420EFC63A136 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		501FFA2FC8631AEFB0E8AFD8 /* ModelDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadManager.swift; sourceTree = "<group>"; };
 		584F44EEF7D1999866322A62 /* FoodAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodAnalyzer.swift; sourceTree = "<group>"; };
 		6495CC9C40F99DF2082628A7 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -52,15 +62,21 @@
 		9EE37FD8C63A980AFF0511DE /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		A6E495921F8F10B4DC547B95 /* DailyCalorieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCalorieChart.swift; sourceTree = "<group>"; };
 		A967018AB8A88339BFBACD53 /* FoodDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDetailSheet.swift; sourceTree = "<group>"; };
+		AA56A6F61DC5D4B5F7258B67 /* EditFoodEntrySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFoodEntrySheet.swift; sourceTree = "<group>"; };
+		AF451DA8D23010468596F80B /* ManualFoodEntrySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualFoodEntrySheet.swift; sourceTree = "<group>"; };
 		B17DE1E3F14D6665562A5B6F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B2FDAA88C9A226E5F406FD4A /* FoodEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodEntry.swift; sourceTree = "<group>"; };
 		BEAEF80A4B909B87AD626AB2 /* NutritionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionResult.swift; sourceTree = "<group>"; };
+		C101A574FB3FCE55299DDD2E /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		D0B3030309D1678AC7A825D6 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		DB72FAA32CD5CA5FBA5F7A1F /* CalorieProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalorieProgressRing.swift; sourceTree = "<group>"; };
 		DDED89DE02B71050169171D4 /* KalorientrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalorientrackerApp.swift; sourceTree = "<group>"; };
+		DEA89079A88F09484ED2BA8C /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		E18D2D7BC9516B41B579AE89 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		E42DA6DFFC778D4B2080138B /* GeminiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiService.swift; sourceTree = "<group>"; };
 		E434795CB2BD97F6E4C23CBD /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
+		E9576F30627FB01B1888FEB3 /* MealCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealCategory.swift; sourceTree = "<group>"; };
+		F53E68E278CE4BBA41F6D137 /* AddFoodSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFoodSheet.swift; sourceTree = "<group>"; };
 		FD3665C4F6762CF0FA87B6FC /* AnalysisResultCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisResultCard.swift; sourceTree = "<group>"; };
 		FDE5712B6F95DEBB8C7A8841 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -69,6 +85,7 @@
 		0810BFA4CD022A598D311AC7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				C101A574FB3FCE55299DDD2E /* AuthManager.swift */,
 				96D09F55D5F598E4EC6D0114 /* CalorieCalculator.swift */,
 				584F44EEF7D1999866322A62 /* FoodAnalyzer.swift */,
 				E42DA6DFFC778D4B2080138B /* GeminiService.swift */,
@@ -77,10 +94,19 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		133C433E82E2A48E80E43D4F /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				DEA89079A88F09484ED2BA8C /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		1ECB8F3C0E62F668673D7519 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				B2FDAA88C9A226E5F406FD4A /* FoodEntry.swift */,
+				E9576F30627FB01B1888FEB3 /* MealCategory.swift */,
 				BEAEF80A4B909B87AD626AB2 /* NutritionResult.swift */,
 				FDE5712B6F95DEBB8C7A8841 /* UserProfile.swift */,
 			);
@@ -123,6 +149,7 @@
 			children = (
 				9F57BB5756663512420B56A6 /* Camera */,
 				D837DFDB6D437D1D50420560 /* Components */,
+				133C433E82E2A48E80E43D4F /* Onboarding */,
 				BEBD53328266636C3933D3DB /* Profile */,
 				9724F140701FE325F8C1BC81 /* Statistics */,
 				CC1FD1C4C410FEBC26155BA1 /* Today */,
@@ -177,9 +204,13 @@
 		CC1FD1C4C410FEBC26155BA1 /* Today */ = {
 			isa = PBXGroup;
 			children = (
+				F53E68E278CE4BBA41F6D137 /* AddFoodSheet.swift */,
 				DB72FAA32CD5CA5FBA5F7A1F /* CalorieProgressRing.swift */,
+				AA56A6F61DC5D4B5F7258B67 /* EditFoodEntrySheet.swift */,
+				089CBA1FC5631EF055B48A5E /* FavoritesSheet.swift */,
 				A967018AB8A88339BFBACD53 /* FoodDetailSheet.swift */,
 				9C86DA50F9C50353FA58B8B8 /* FoodEntryRow.swift */,
+				AF451DA8D23010468596F80B /* ManualFoodEntrySheet.swift */,
 				9EE37FD8C63A980AFF0511DE /* TodayView.swift */,
 			);
 			path = Today;
@@ -191,6 +222,7 @@
 				2EB62296B414BDD585CB9BB6 /* GlassCard.swift */,
 				E434795CB2BD97F6E4C23CBD /* GradientButton.swift */,
 				12DE4B2EA9D68D1640BBA396 /* ModelDownloadView.swift */,
+				4B741B3B30A6420EFC63A136 /* ToastView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -266,14 +298,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD5564EB00D906098E07E861 /* AddFoodSheet.swift in Sources */,
 				82BC34AB929F510FC2C05A84 /* AnalysisResultCard.swift in Sources */,
+				72588C2E14E362E3F09236CD /* AuthManager.swift in Sources */,
 				7CAB2114AB25ED2ED0A70D47 /* CalorieCalculator.swift in Sources */,
 				A2637EA1A72A1B971CA9A9C0 /* CalorieProgressRing.swift in Sources */,
 				FAE3D599DC63DF6F982DCD45 /* CameraView.swift in Sources */,
 				DEBFBF16FB74D930B8BF9316 /* Constants.swift in Sources */,
 				B6E394D5693AEB3AB2CEAC4D /* ContentView.swift in Sources */,
 				15C211C05CFEF8AFDF0168B3 /* DailyCalorieChart.swift in Sources */,
+				D2B6045911731F9EC906B6C3 /* EditFoodEntrySheet.swift in Sources */,
 				FF7BEF7409451E80059ADC0E /* Extensions.swift in Sources */,
+				26AD227D4757E18A04AEC771 /* FavoritesSheet.swift in Sources */,
 				9539BA5ADEB80BC71DAC4B5C /* FoodAnalyzer.swift in Sources */,
 				6F3DDABA89F30CC5AEAFA36F /* FoodDetailSheet.swift in Sources */,
 				3FF4F928B9AF3D9252A0B945 /* FoodEntry.swift in Sources */,
@@ -283,12 +319,16 @@
 				2658017517DF70186BBC296A /* GradientButton.swift in Sources */,
 				568B715A28143DBE5D44B6F3 /* KalorientrackerApp.swift in Sources */,
 				7B3C342F57AF0953150ADFA0 /* MacroBreakdownChart.swift in Sources */,
+				E0A19B19C0A047274D341FF7 /* ManualFoodEntrySheet.swift in Sources */,
+				2E735C268C4AC841F29FCF1A /* MealCategory.swift in Sources */,
 				C5F31DD6A737BBA7B4FA0AE4 /* ModelDownloadManager.swift in Sources */,
 				2757D1A9EB078DD3CAC75393 /* ModelDownloadView.swift in Sources */,
 				B1F2A04ABC4B794043C7DD07 /* NutritionResult.swift in Sources */,
+				53052296178BCB07B6CE4C57 /* OnboardingView.swift in Sources */,
 				BC8578FEE7E08097D8847950 /* PhotoReviewView.swift in Sources */,
 				3561E25F357D3FFB04EC6141 /* ProfileView.swift in Sources */,
 				32772A983E392ADE04E93483 /* StatisticsView.swift in Sources */,
+				390533B144F8D67861EE3F5A /* ToastView.swift in Sources */,
 				7372F37E4CAD4A35FB698AB1 /* TodayView.swift in Sources */,
 				54E59CAD3468EED48C93B53C /* UserProfile.swift in Sources */,
 			);

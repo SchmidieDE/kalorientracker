@@ -11,8 +11,8 @@ build/
 *.swp
 *~.nib
 
-## Models (too large for git)
-models/
+## GGUF Models (too large for git)
+/models/
 *.gguf
 
 ## Swift Package Manager

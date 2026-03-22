@@ -1,6 +1,37 @@
 import SwiftData
 import Foundation
 
+enum NutritionGoal: String, Codable, CaseIterable {
+    case lose = "lose"
+    case maintain = "maintain"
+    case gain = "gain"
+
+    var label: String {
+        switch self {
+        case .lose: return "Abnehmen"
+        case .maintain: return "Halten"
+        case .gain: return "Zunehmen"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .lose: return "arrow.down.circle"
+        case .maintain: return "equal.circle"
+        case .gain: return "arrow.up.circle"
+        }
+    }
+
+    /// Calorie adjustment factor relative to TDEE
+    var calorieFactor: Double {
+        switch self {
+        case .lose: return 0.8       // -20% deficit
+        case .maintain: return 1.0
+        case .gain: return 1.15      // +15% surplus
+        }
+    }
+}
+
 enum AIMode: String, Codable, CaseIterable {
     case cloudOnly = "cloudOnly"
     case localOnly = "localOnly"
@@ -33,8 +64,15 @@ final class UserProfile {
     var useComputedTarget: Bool = true
     var aiModeRaw: String = AIMode.cloudOnly.rawValue
     var localModelDownloaded: Bool = false
+    var hasCompletedOnboarding: Bool = false
+    var goalRaw: String = "maintain"
 
     init() {}
+
+    var goal: NutritionGoal {
+        get { NutritionGoal(rawValue: goalRaw) ?? .maintain }
+        set { goalRaw = newValue.rawValue }
+    }
 
     var aiMode: AIMode {
         get { AIMode(rawValue: aiModeRaw) ?? .cloudOnly }
@@ -61,8 +99,8 @@ final class UserProfile {
         return bmr * multiplier
     }
 
-    /// Recommended daily calories
+    /// Recommended daily calories (adjusted for goal)
     var recommendedCalories: Int {
-        useComputedTarget ? Int(tdee) : targetCalories
+        useComputedTarget ? Int(tdee * goal.calorieFactor) : targetCalories
     }
 }

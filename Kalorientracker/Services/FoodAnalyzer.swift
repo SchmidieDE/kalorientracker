@@ -37,10 +37,6 @@ final class FoodAnalyzer: ObservableObject {
 
             switch aiMode {
             case .cloudOnly:
-                if authToken == nil {
-                    lastError = "Bitte melde dich an, um Cloud-AI zu nutzen"
-                    return nil
-                }
                 analysisSource = .cloud
                 result = try await geminiService.analyze(image: image, authToken: authToken)
 

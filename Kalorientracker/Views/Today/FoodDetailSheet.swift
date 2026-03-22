@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FoodDetailSheet: View {
     let entry: FoodEntry
+    var onEdit: (() -> Void)? = nil
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -19,6 +20,18 @@ struct FoodDetailSheet: View {
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             .padding(.horizontal)
                     }
+
+                    // Meal category badge
+                    HStack(spacing: 6) {
+                        Image(systemName: entry.mealCategory.icon)
+                        Text(entry.mealCategory.label)
+                    }
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Constants.Colors.gradientStart)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Constants.Colors.gradientStart.opacity(0.15))
+                    .clipShape(Capsule())
 
                     // Name and calories
                     VStack(spacing: 8) {
@@ -61,6 +74,14 @@ struct FoodDetailSheet: View {
                     .padding(20)
                     .glassCard()
                     .padding(.horizontal)
+
+                    // Edit button
+                    if let onEdit {
+                        SecondaryButton(title: "Bearbeiten") {
+                            onEdit()
+                        }
+                        .padding(.horizontal)
+                    }
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 40)

@@ -243,6 +243,46 @@ struct ProfileView: View {
         .glassCard()
         .padding(.horizontal)
 
+        // Goal selection
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Ziel")
+                .font(.headline)
+                .foregroundStyle(.white)
+
+            HStack(spacing: 8) {
+                ForEach(NutritionGoal.allCases, id: \.self) { g in
+                    Button {
+                        let impact = UIImpactFeedbackGenerator(style: .light)
+                        impact.impactOccurred()
+                        withAnimation { profile.goal = g }
+                    } label: {
+                        VStack(spacing: 6) {
+                            Image(systemName: g.icon)
+                                .font(.title3)
+                            Text(g.label)
+                                .font(.caption.weight(.medium))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .foregroundStyle(profile.goal == g ? .white : Constants.Colors.textSecondary)
+                        .background(
+                            profile.goal == g
+                                ? AnyShapeStyle(Constants.Colors.accentGradient)
+                                : AnyShapeStyle(Constants.Colors.surface)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(profile.goal == g ? Color.clear : Constants.Colors.glassBorder, lineWidth: 1)
+                        )
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .glassCard()
+        .padding(.horizontal)
+
         // Personal data
         VStack(alignment: .leading, spacing: 16) {
             Text("Persönliche Daten")
@@ -336,6 +376,15 @@ struct ProfileView: View {
                             .foregroundStyle(Constants.Colors.textSecondary)
                         Spacer()
                         Text("\(Int(profile.tdee)) kcal")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white)
+                    }
+                    HStack {
+                        Text("Ziel: \(profile.goal.label)")
+                            .font(.caption)
+                            .foregroundStyle(Constants.Colors.textSecondary)
+                        Spacer()
+                        Text("\(profile.recommendedCalories) kcal")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Constants.Colors.gradientStart)
                     }

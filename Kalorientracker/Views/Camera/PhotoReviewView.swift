@@ -4,7 +4,7 @@ import SwiftData
 struct PhotoReviewView: View {
     let image: UIImage
     @ObservedObject var analyzer: FoodAnalyzer
-    let onSave: (NutritionResult) -> Void
+    let onSave: (NutritionResult, MealCategory) -> Void
     @Environment(\.dismiss) private var dismiss
 
     @Query private var profiles: [UserProfile]
@@ -82,10 +82,10 @@ struct PhotoReviewView: View {
                     .glassCard()
                     .padding()
                 } else if let result {
-                    AnalysisResultCard(result: result, onSave: {
+                    AnalysisResultCard(result: result, onSave: { mealCategory in
                         let impact = UINotificationFeedbackGenerator()
                         impact.notificationOccurred(.success)
-                        onSave(result)
+                        onSave(result, mealCategory)
                     }, onDiscard: {
                         dismiss()
                     })

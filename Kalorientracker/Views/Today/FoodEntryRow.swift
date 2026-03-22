@@ -24,10 +24,17 @@ struct FoodEntryRow: View {
 
             // Info
             VStack(alignment: .leading, spacing: 4) {
-                Text(entry.name)
-                    .font(.body.bold())
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Text(entry.name)
+                        .font(.body.bold())
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    if entry.isFavorite {
+                        Image(systemName: "star.fill")
+                            .font(.caption2)
+                            .foregroundStyle(Constants.Colors.warning)
+                    }
+                }
 
                 HStack(spacing: 8) {
                     Text(entry.timestamp.shortTime)
