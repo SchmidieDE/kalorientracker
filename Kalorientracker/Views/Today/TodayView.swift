@@ -187,6 +187,7 @@ struct TodayView: View {
                         imageData: image.jpegCompressed(quality: 0.5, maxDimension: 512),
                         portionDescription: result.portionDescription,
                         suggestion: result.suggestions,
+                        emoji: result.emoji,
                         analysisSource: analyzer.analysisSource,
                         mealCategory: mealCategory
                     )
@@ -389,6 +390,7 @@ struct TodayView: View {
             imageData: entry.imageData,
             portionDescription: entry.portionDescription,
             suggestion: entry.suggestion,
+            emoji: entry.emoji,
             analysisSource: entry.source,
             mealCategory: MealCategory.fromCurrentTime()
         )

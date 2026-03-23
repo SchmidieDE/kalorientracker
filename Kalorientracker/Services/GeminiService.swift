@@ -62,7 +62,7 @@ final class GeminiService: Sendable {
             throw GeminiError.decodingError(error)
         }
 
-        if result.confidence < 0.1 {
+        if result.isFood == false || result.confidence < 0.1 {
             throw GeminiError.notFood
         }
 

@@ -9,7 +9,11 @@ struct AnalysisResultCard: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            // Food name
+            // Food emoji + name
+            if let emoji = result.emoji, !emoji.isEmpty {
+                Text(emoji)
+                    .font(.system(size: 44))
+            }
             Text(result.name)
                 .font(.title2.bold())
                 .foregroundStyle(.white)

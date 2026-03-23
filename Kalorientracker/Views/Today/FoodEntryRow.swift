@@ -12,6 +12,14 @@ struct FoodEntryRow: View {
                     .scaledToFill()
                     .frame(width: 52, height: 52)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            } else if let emoji = entry.emoji, !emoji.isEmpty {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Constants.Colors.surface)
+                    .frame(width: 52, height: 52)
+                    .overlay(
+                        Text(emoji)
+                            .font(.system(size: 28))
+                    )
             } else {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(Constants.Colors.surface)
