@@ -65,6 +65,7 @@ struct PhotoReviewView: View {
                         .padding()
                         .transition(.opacity)
                 } else if let error = analyzer.lastError {
+                    Spacer()
                     VStack(spacing: 16) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.largeTitle)
@@ -77,10 +78,15 @@ struct PhotoReviewView: View {
                             startAnalysis()
                         }
                         .padding(.horizontal, 40)
+                        SecondaryButton(title: "Abbrechen") {
+                            dismiss()
+                        }
+                        .padding(.horizontal, 40)
                     }
                     .padding()
                     .glassCard()
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.bottom, 16)
                 } else if let result {
                     AnalysisResultCard(result: result, onSave: { mealCategory in
                         let impact = UINotificationFeedbackGenerator()
