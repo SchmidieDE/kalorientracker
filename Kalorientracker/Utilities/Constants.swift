@@ -9,15 +9,15 @@ enum Constants {
     // 4B variant — better quality, needs ≥6GB RAM (iPhone 15 Pro+)
     static let largeModelName = "Qwen3.5-4B.Q4_K_M.gguf"
     static let largeMmprojName = "Qwen3.5-4B-mmproj.gguf"
-    static let largeModelURL = "https://huggingface.co/bjivanovich/Qwen3.5-4B-Vision-GGUF/resolve/main/Qwen3.5-4B.Q4_K_M.gguf"
-    static let largeMmprojURL = "https://huggingface.co/bjivanovich/Qwen3.5-4B-Vision-GGUF/resolve/main/Qwen3.5-4B-mmproj.gguf"
+    static let largeModelURL = "\(apiBaseURL)/models/Qwen3.5-4B.Q4_K_M.gguf"
+    static let largeMmprojURL = "\(apiBaseURL)/models/Qwen3.5-4B-mmproj.gguf"
     static let largeModelSize: Int64 = 2_800_000_000
 
     // 2B variant — faster, works on ≥4GB RAM (iPhone 12+)
     static let smallModelName = "Qwen3.5-2B.Q4_K_M.gguf"
     static let smallMmprojName = "Qwen3.5-2B-mmproj.gguf"
-    static let smallModelURL = "https://huggingface.co/bjivanovich/Qwen3.5-2B-Vision-GGUF/resolve/main/Qwen3.5-2B.Q4_K_M.gguf"
-    static let smallMmprojURL = "https://huggingface.co/bjivanovich/Qwen3.5-2B-Vision-GGUF/resolve/main/Qwen3.5-2B-mmproj.gguf"
+    static let smallModelURL = "\(apiBaseURL)/models/Qwen3.5-2B.Q4_K_M.gguf"
+    static let smallMmprojURL = "\(apiBaseURL)/models/Qwen3.5-2B-mmproj.gguf"
     static let smallModelSize: Int64 = 1_300_000_000
 
     // Auto-select based on device RAM

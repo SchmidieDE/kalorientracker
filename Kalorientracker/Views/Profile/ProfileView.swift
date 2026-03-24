@@ -243,10 +243,17 @@ struct ProfileView: View {
                 }
             }
 
+            if let warning = downloadManager.storageWarning {
+                Text(warning)
+                    .font(.caption)
+                    .foregroundStyle(Constants.Colors.warning)
+            }
+
             if let error = downloadManager.error {
                 Text(error)
                     .font(.caption)
                     .foregroundStyle(Constants.Colors.danger)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(20)

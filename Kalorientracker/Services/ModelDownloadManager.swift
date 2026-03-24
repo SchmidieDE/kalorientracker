@@ -12,6 +12,9 @@ final class ModelDownloadManager: NSObject, ObservableObject {
     @Published var totalBytes: Int64 = 0
     @Published var downloadPhase: DownloadPhase = .model
     @Published var speedBytesPerSec: Double = 0
+    @Published var storageWarning: String?
+
+    fileprivate var resumeData: Data?
 
     enum DownloadPhase: String {
         case model = "Modell"
@@ -98,8 +101,34 @@ final class ModelDownloadManager: NSObject, ObservableObject {
 
     // MARK: - Download
 
+    /// Check available disk space in bytes
+    private var availableStorage: Int64 {
+        let home = URL(fileURLWithPath: NSHomeDirectory())
+        guard let values = try? home.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]),
+              let capacity = values.volumeAvailableCapacityForImportantUsage else { return 0 }
+        return capacity
+    }
+
     func startDownload() {
         guard !isDownloading else { return }
+
+        // Check disk space
+        let needed = Constants.localModelSize + 700_000_000 // model + mmproj
+        let available = availableStorage
+        storageWarning = nil
+
+        if available < needed + 500_000_000 { // less than 500MB buffer
+            let availGB = String(format: "%.1f", Double(available) / 1_000_000_000)
+            let needGB = String(format: "%.1f", Double(needed) / 1_000_000_000)
+            error = "Nicht genug Speicherplatz\n(\(availGB) GB frei, \(needGB) GB benötigt)"
+            return
+        }
+
+        if available < needed + 5_000_000_000 { // less than 5GB remaining after download
+            let remainGB = String(format: "%.1f", Double(available - needed) / 1_000_000_000)
+            storageWarning = "Achtung: Nach dem Download nur noch ~\(remainGB) GB frei"
+        }
+
         isDownloading = true
         progress = 0
         error = nil
@@ -148,16 +177,28 @@ final class ModelDownloadManager: NSObject, ObservableObject {
 
         // Use delegate-based session for reliable progress
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForResource = 3600 // 1 hour for large files
+        config.timeoutIntervalForResource = 3600
         session = URLSession(configuration: config, delegate: DownloadDelegate(manager: self), delegateQueue: .main)
-        let task = session!.downloadTask(with: url)
+
+        // Resume if we have resume data from a previous attempt
+        let task: URLSessionDownloadTask
+        if let resumeData {
+            task = session!.downloadTask(withResumeData: resumeData)
+            self.resumeData = nil
+        } else {
+            task = session!.downloadTask(with: url)
+        }
         task.resume()
         downloadTask = task
     }
 
     func cancelDownload() {
-        downloadTask?.cancel()
-        session?.invalidateAndCancel()
+        downloadTask?.cancel(byProducingResumeData: { [weak self] data in
+            Task { @MainActor in
+                self?.resumeData = data
+            }
+        })
+        session?.finishTasksAndInvalidate()
         isDownloading = false
         progress = 0
         downloadedBytes = 0
@@ -284,8 +325,14 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard let error else { return }
-        // Ignore cancellation
-        if (error as NSError).code == NSURLErrorCancelled { return }
+        // Save resume data for network errors
+        let nsError = error as NSError
+        if let resumeData = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
+            Task { @MainActor in
+                self.manager?.resumeData = resumeData
+            }
+        }
+        if nsError.code == NSURLErrorCancelled { return }
         Task { @MainActor in
             self.manager?.handleCompletion(tempURL: nil, error: error)
         }

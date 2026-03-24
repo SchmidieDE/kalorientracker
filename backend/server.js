@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
@@ -13,6 +14,12 @@ app.use(cors());
 
 // Body limit for base64 images
 app.use(express.json({ limit: '10mb' }));
+
+// Serve GGUF model files (mounted at /app/models in container)
+app.use('/models', express.static(path.join(__dirname, 'models'), {
+  maxAge: '7d',
+  acceptRanges: true, // Enable Range requests for resumable downloads
+}));
 
 // Rate limiting: 60 requests per hour per IP
 const limiter = rateLimit({
