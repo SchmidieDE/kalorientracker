@@ -27,98 +27,92 @@ struct AnalysisResultCard: View {
     }
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 16) {
-                // Emoji + Name
-                HStack(spacing: 10) {
-                    if let emoji = activeEmoji, !emoji.isEmpty {
-                        Text(emoji)
-                            .font(.system(size: 36))
-                    }
-                    Text(activeName)
-                        .font(.title3.bold())
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .multilineTextAlignment(.leading)
-                    Spacer()
-                }
-
-                // Calories
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("\(activeCalories)")
-                        .font(.system(size: 44, weight: .heavy, design: .rounded))
-                        .foregroundStyle(Constants.Colors.accentGradient)
-                    Text("kcal")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(Constants.Colors.textSecondary)
-                    Spacer()
-
-                    // Confidence
-                    HStack(spacing: 3) {
-                        ForEach(0..<5) { i in
-                            Circle()
-                                .fill(Double(i) < (result.confidence * 5.0) ? Constants.Colors.gradientStart : Constants.Colors.surface)
-                                .frame(width: 6, height: 6)
-                        }
-                    }
-                }
-
-                // Macros as compact row
-                HStack(spacing: 0) {
-                    MacroPillCompact(label: "P", value: activeProtein, color: Constants.Colors.proteinColor)
-                    Spacer()
-                    MacroPillCompact(label: "K", value: activeCarbs, color: Constants.Colors.carbsColor)
-                    Spacer()
-                    MacroPillCompact(label: "F", value: activeFat, color: Constants.Colors.fatColor)
-                }
-
-                // Portion
-                if !result.portionDescription.isEmpty {
-                    HStack(spacing: 6) {
-                        Image(systemName: "scalemass")
-                            .font(.caption2)
-                        Text(result.portionDescription)
-                            .font(.caption)
-                    }
-                    .foregroundStyle(Constants.Colors.textSecondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-
-                // Alternatives (when uncertain)
-                if isUncertain {
-                    alternativesSection
-                }
-
-                // Suggestion
-                if let suggestion = result.suggestions, !suggestion.isEmpty {
-                    HStack(alignment: .top, spacing: 8) {
-                        Image(systemName: "lightbulb.fill")
-                            .foregroundStyle(Constants.Colors.warning)
-                            .font(.caption2)
-                        Text(suggestion)
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.8))
-                    }
-                    .padding(10)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Constants.Colors.warning.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-
-                // Buttons
-                VStack(spacing: 8) {
-                    GradientButton("Speichern", icon: "checkmark") {
-                        onSave(resolvedResult, MealCategory.fromCurrentTime())
-                    }
-                    SecondaryButton(title: "Verwerfen") {
-                        onDiscard()
-                    }
-                }
-                .padding(.top, 4)
+        VStack(spacing: 14) {
+            // Emoji
+            if let emoji = activeEmoji, !emoji.isEmpty {
+                Text(emoji)
+                    .font(.system(size: 40))
             }
-            .padding(16)
+
+            // Name
+            Text(activeName)
+                .font(.title3.bold())
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+
+            // Calories
+            VStack(spacing: 2) {
+                Text("\(activeCalories)")
+                    .font(.system(size: 40, weight: .heavy, design: .rounded))
+                    .foregroundStyle(Constants.Colors.accentGradient)
+                Text("kcal")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Constants.Colors.textSecondary)
+            }
+
+            // Confidence
+            HStack(spacing: 3) {
+                ForEach(0..<5) { i in
+                    Circle()
+                        .fill(Double(i) < (result.confidence * 5.0) ? Constants.Colors.gradientStart : Constants.Colors.surface)
+                        .frame(width: 6, height: 6)
+                }
+                Text(result.confidence > 0.8 ? "Sehr sicher" : result.confidence > 0.5 ? "Sicher" : "Schätzung")
+                    .font(.caption2)
+                    .foregroundStyle(Constants.Colors.textSecondary)
+            }
+
+            // Macros
+            HStack(spacing: 8) {
+                MacroPillCompact(label: "P", value: activeProtein, color: Constants.Colors.proteinColor)
+                MacroPillCompact(label: "K", value: activeCarbs, color: Constants.Colors.carbsColor)
+                MacroPillCompact(label: "F", value: activeFat, color: Constants.Colors.fatColor)
+            }
+
+            // Portion
+            if !result.portionDescription.isEmpty {
+                HStack(spacing: 4) {
+                    Image(systemName: "scalemass")
+                        .font(.caption2)
+                    Text(result.portionDescription)
+                        .font(.caption)
+                }
+                .foregroundStyle(Constants.Colors.textSecondary)
+            }
+
+            // Alternatives
+            if isUncertain {
+                alternativesSection
+            }
+
+            // Suggestion
+            if let suggestion = result.suggestions, !suggestion.isEmpty {
+                HStack(alignment: .top, spacing: 6) {
+                    Image(systemName: "lightbulb.fill")
+                        .foregroundStyle(Constants.Colors.warning)
+                        .font(.caption2)
+                    Text(suggestion)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.8))
+                        .lineLimit(3)
+                }
+                .padding(10)
+                .background(Constants.Colors.warning.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+
+            // Buttons
+            VStack(spacing: 8) {
+                GradientButton("Speichern", icon: "checkmark") {
+                    onSave(resolvedResult, MealCategory.fromCurrentTime())
+                }
+                SecondaryButton(title: "Verwerfen") {
+                    onDiscard()
+                }
+            }
         }
-        .frame(maxHeight: UIScreen.main.bounds.height * 0.6)
+        .padding(16)
         .glassCard()
     }
 
@@ -142,48 +136,38 @@ struct AnalysisResultCard: View {
 
     @ViewBuilder
     private var alternativesSection: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 6) {
+        VStack(spacing: 8) {
+            HStack(spacing: 4) {
                 Image(systemName: "questionmark.circle.fill")
                     .foregroundStyle(Constants.Colors.warning)
                     .font(.caption)
                 Text("Meintest du...?")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.white)
-                Spacer()
             }
 
             FlowLayout(spacing: 6) {
                 AlternativeChip(
-                    name: result.name,
-                    emoji: result.emoji,
+                    name: result.name, emoji: result.emoji,
                     isSelected: selectedAlternative == nil && customName.isEmpty
-                ) {
-                    selectedAlternative = nil
-                    customName = ""
-                }
+                ) { selectedAlternative = nil; customName = "" }
 
                 ForEach(result.alternatives ?? [], id: \.name) { alt in
                     AlternativeChip(
-                        name: alt.name,
-                        emoji: alt.emoji,
+                        name: alt.name, emoji: alt.emoji,
                         isSelected: selectedAlternative?.name == alt.name
-                    ) {
-                        selectedAlternative = alt
-                        customName = ""
-                    }
+                    ) { selectedAlternative = alt; customName = "" }
                 }
             }
 
             if showCustomInput {
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     TextField("Name eingeben...", text: $customName)
                         .font(.caption)
                         .foregroundStyle(.white)
                         .padding(8)
                         .background(Constants.Colors.surface)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .onSubmit { if !customName.isEmpty { selectedAlternative = nil } }
                     Button { showCustomInput = false; customName = "" } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.caption)
@@ -191,9 +175,7 @@ struct AnalysisResultCard: View {
                     }
                 }
             } else {
-                Button {
-                    showCustomInput = true
-                } label: {
+                Button { showCustomInput = true } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "pencil")
                         Text("Eigenen Namen")
@@ -203,9 +185,9 @@ struct AnalysisResultCard: View {
                 }
             }
         }
-        .padding(12)
+        .padding(10)
         .background(Constants.Colors.surface.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
@@ -217,7 +199,7 @@ private struct MacroPillCompact: View {
     let color: Color
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             Text(label)
                 .font(.caption2.bold())
                 .foregroundStyle(color)
@@ -228,8 +210,8 @@ private struct MacroPillCompact: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.white)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
         .background(Constants.Colors.surface)
         .clipShape(Capsule())
     }
@@ -258,7 +240,6 @@ private struct AlternativeChip: View {
             .foregroundStyle(isSelected ? .white : Constants.Colors.textSecondary)
             .background(isSelected ? AnyShapeStyle(Constants.Colors.accentGradient) : AnyShapeStyle(Constants.Colors.surface))
             .clipShape(Capsule())
-            .overlay(Capsule().stroke(isSelected ? Color.clear : Constants.Colors.glassBorder, lineWidth: 1))
         }
     }
 }
@@ -273,8 +254,8 @@ struct FlowLayout: Layout {
     }
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = arrange(proposal: proposal, subviews: subviews)
-        for (i, pos) in result.positions.enumerated() {
+        let r = arrange(proposal: proposal, subviews: subviews)
+        for (i, pos) in r.positions.enumerated() {
             subviews[i].place(at: CGPoint(x: bounds.minX + pos.x, y: bounds.minY + pos.y), proposal: .unspecified)
         }
     }
@@ -302,7 +283,6 @@ struct MacroBar: View {
     let value: Double
     let color: Color
     let maxValue: Double
-
     private var ratio: Double { maxValue > 0 ? value / maxValue : 0 }
 
     var body: some View {

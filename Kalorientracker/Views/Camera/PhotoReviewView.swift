@@ -89,15 +89,18 @@ struct PhotoReviewView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 16)
                 } else if let result {
-                    AnalysisResultCard(result: result, onSave: { resolvedResult, mealCategory in
-                        let impact = UINotificationFeedbackGenerator()
-                        impact.notificationOccurred(.success)
-                        onSave(resolvedResult, mealCategory)
-                    }, onDiscard: {
-                        dismiss()
-                    })
+                    ScrollView(.vertical, showsIndicators: false) {
+                        AnalysisResultCard(result: result, onSave: { resolvedResult, mealCategory in
+                            let impact = UINotificationFeedbackGenerator()
+                            impact.notificationOccurred(.success)
+                            onSave(resolvedResult, mealCategory)
+                        }, onDiscard: {
+                            dismiss()
+                        })
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 20)
+                    }
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .padding()
                 }
             }
         }

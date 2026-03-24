@@ -239,6 +239,21 @@ final class ModelDownloadManager: NSObject, ObservableObject {
 
         return text
     }
+
+    var formattedETA: String? {
+        guard speedBytesPerSec > 100, totalBytes > 0 else { return nil }
+        let remaining = Double(totalBytes - downloadedBytes)
+        let seconds = remaining / speedBytesPerSec
+        if seconds < 60 {
+            return "~\(Int(seconds)) Sek. verbleibend"
+        } else if seconds < 3600 {
+            return "~\(Int(seconds / 60)) Min. verbleibend"
+        } else {
+            let h = Int(seconds / 3600)
+            let m = Int((seconds.truncatingRemainder(dividingBy: 3600)) / 60)
+            return "~\(h) Std. \(m) Min. verbleibend"
+        }
+    }
 }
 
 // MARK: - URLSession Delegate (for reliable download progress)

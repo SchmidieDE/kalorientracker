@@ -221,6 +221,11 @@ struct ProfileView: View {
                     Text(downloadManager.formattedProgress)
                         .font(.caption)
                         .foregroundStyle(Constants.Colors.textSecondary)
+                    if let eta = downloadManager.formattedETA {
+                        Text(eta)
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(Constants.Colors.gradientStart)
+                    }
                     Text("Download läuft im Hintergrund weiter")
                         .font(.caption2)
                         .foregroundStyle(Constants.Colors.textSecondary.opacity(0.6))
