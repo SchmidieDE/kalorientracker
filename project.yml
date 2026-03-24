@@ -18,6 +18,11 @@ targets:
     platform: iOS
     sources:
       - path: Kalorientracker
+    entitlements:
+      path: Kalorientracker/Kalorientracker.entitlements
+      properties:
+        com.apple.developer.applesignin:
+          - Default
     settings:
       base:
         INFOPLIST_KEY_NSCameraUsageDescription: "Kalorientracker benötigt Zugriff auf die Kamera, um dein Essen zu fotografieren und die Kalorien zu analysieren."
