@@ -272,6 +272,31 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
     }
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        // Check HTTP status — reject non-200 responses (e.g. 404 saved as file)
+        if let httpResponse = downloadTask.response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+            Task { @MainActor in
+                self.manager?.handleCompletion(tempURL: nil, error: NSError(
+                    domain: "ModelDownload",
+                    code: httpResponse.statusCode,
+                    userInfo: [NSLocalizedDescriptionKey: "Download fehlgeschlagen\n(Server-Fehler \(httpResponse.statusCode))"]
+                ))
+            }
+            return
+        }
+
+        // Check file size — GGUF must be > 100MB
+        let fileSize = (try? FileManager.default.attributesOfItem(atPath: location.path)[.size] as? Int64) ?? 0
+        if fileSize < 100_000_000 {
+            Task { @MainActor in
+                self.manager?.handleCompletion(tempURL: nil, error: NSError(
+                    domain: "ModelDownload",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "Download ungültig\n(Datei zu klein: \(fileSize / 1_000_000) MB)"]
+                ))
+            }
+            return
+        }
+
         // Copy to temp because the file gets deleted after this callback
         let tempDir = FileManager.default.temporaryDirectory
         let tempFile = tempDir.appendingPathComponent(UUID().uuidString + ".gguf")

@@ -90,9 +90,9 @@ struct TodayView: View {
 
                     // Macro Pills
                     HStack(spacing: 8) {
-                        MacroPill(label: "P", value: totalProtein, color: Constants.Colors.proteinColor)
-                        MacroPill(label: "K", value: totalCarbs, color: Constants.Colors.carbsColor)
-                        MacroPill(label: "F", value: totalFat, color: Constants.Colors.fatColor)
+                        MacroPill(label: "Prot.", value: totalProtein, color: Constants.Colors.proteinColor)
+                        MacroPill(label: "Carbs", value: totalCarbs, color: Constants.Colors.carbsColor)
+                        MacroPill(label: "Fett", value: totalFat, color: Constants.Colors.fatColor)
                     }
 
                     // Entries grouped by meal

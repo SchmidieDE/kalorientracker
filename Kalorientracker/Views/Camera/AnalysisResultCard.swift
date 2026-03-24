@@ -65,9 +65,9 @@ struct AnalysisResultCard: View {
 
             // Macros
             HStack(spacing: 8) {
-                MacroPillCompact(label: "P", value: activeProtein, color: Constants.Colors.proteinColor)
-                MacroPillCompact(label: "K", value: activeCarbs, color: Constants.Colors.carbsColor)
-                MacroPillCompact(label: "F", value: activeFat, color: Constants.Colors.fatColor)
+                MacroPillCompact(label: "Prot.", value: activeProtein, color: Constants.Colors.proteinColor)
+                MacroPillCompact(label: "Carbs", value: activeCarbs, color: Constants.Colors.carbsColor)
+                MacroPillCompact(label: "Fett", value: activeFat, color: Constants.Colors.fatColor)
             }
 
             // Portion
@@ -203,9 +203,6 @@ private struct MacroPillCompact: View {
             Text(label)
                 .font(.caption2.bold())
                 .foregroundStyle(color)
-                .frame(width: 14, height: 14)
-                .background(color.opacity(0.2))
-                .clipShape(Circle())
             Text("\(value.cleanString)g")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.white)
