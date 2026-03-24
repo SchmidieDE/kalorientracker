@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-final class ModelDownloadManager: ObservableObject {
+final class ModelDownloadManager: NSObject, ObservableObject {
     static let shared = ModelDownloadManager()
 
     @Published var isDownloading = false
@@ -11,6 +11,7 @@ final class ModelDownloadManager: ObservableObject {
     @Published var downloadedBytes: Int64 = 0
     @Published var totalBytes: Int64 = 0
     @Published var downloadPhase: DownloadPhase = .model
+    @Published var speedBytesPerSec: Double = 0
 
     enum DownloadPhase: String {
         case model = "Modell"
@@ -18,9 +19,15 @@ final class ModelDownloadManager: ObservableObject {
     }
 
     private var downloadTask: URLSessionDownloadTask?
-    private var _progressObservation: NSKeyValueObservation?
+    private var session: URLSession?
+    private var currentDestination: URL?
+    private var currentCompletion: (@Sendable (Bool) -> Void)?
+    private var downloadStartTime: Date?
+    private var lastSpeedUpdate: Date?
+    private var lastSpeedBytes: Int64 = 0
 
-    init() {
+    override init() {
+        super.init()
         isModelAvailable = bothFilesExist()
     }
 
@@ -38,16 +45,15 @@ final class ModelDownloadManager: ObservableObject {
         documentsDir.appendingPathComponent(Constants.localMmprojName)
     }
 
-    // MARK: - Dev bypass (uses repo models/ directory in DEBUG)
+    // MARK: - Dev bypass
 
     #if DEBUG
     private var devModelsDir: URL? {
-        // #filePath points to this source file → navigate up to repo root
         let sourceFile = URL(fileURLWithPath: #filePath)
         let repoRoot = sourceFile
-            .deletingLastPathComponent() // Services/
-            .deletingLastPathComponent() // Kalorientracker/
-            .deletingLastPathComponent() // project root
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
         let modelsDir = repoRoot.appendingPathComponent("models")
         guard FileManager.default.fileExists(atPath: modelsDir.path) else { return nil }
         return modelsDir
@@ -66,7 +72,6 @@ final class ModelDownloadManager: ObservableObject {
     }
     #endif
 
-    /// Resolved model path: dev path in DEBUG, otherwise downloaded path
     var resolvedModelPath: URL {
         #if DEBUG
         if let devPath = devModelPath { return devPath }
@@ -74,7 +79,6 @@ final class ModelDownloadManager: ObservableObject {
         return modelPath
     }
 
-    /// Resolved mmproj path: dev path in DEBUG, otherwise downloaded path
     var resolvedMmprojPath: URL {
         #if DEBUG
         if let devPath = devMmprojPath { return devPath }
@@ -84,19 +88,12 @@ final class ModelDownloadManager: ObservableObject {
 
     // MARK: - File checks
 
-    private func modelFileExists() -> Bool {
-        FileManager.default.fileExists(atPath: modelPath.path)
-    }
-
-    private func mmprojFileExists() -> Bool {
-        FileManager.default.fileExists(atPath: mmprojPath.path)
-    }
-
     func bothFilesExist() -> Bool {
         #if DEBUG
         if devModelPath != nil && devMmprojPath != nil { return true }
         #endif
-        return modelFileExists() && mmprojFileExists()
+        return FileManager.default.fileExists(atPath: modelPath.path)
+            && FileManager.default.fileExists(atPath: mmprojPath.path)
     }
 
     // MARK: - Download
@@ -107,24 +104,21 @@ final class ModelDownloadManager: ObservableObject {
         progress = 0
         error = nil
         downloadPhase = .model
+        downloadedBytes = 0
+        totalBytes = Constants.localModelSize
+        speedBytesPerSec = 0
 
-        // Download model first, then mmproj
         let mmprojDest = mmprojPath
-        downloadFile(
-            url: Constants.localModelURL,
-            destination: modelPath
-        ) { [weak self] success in
+        downloadFile(url: Constants.localModelURL, destination: modelPath) { [weak self] success in
             Task { @MainActor [weak self] in
                 guard let self, success else { return }
                 self.downloadPhase = .mmproj
                 self.progress = 0
                 self.downloadedBytes = 0
                 self.totalBytes = 0
+                self.speedBytesPerSec = 0
 
-                self.downloadFile(
-                    url: Constants.localMmprojURL,
-                    destination: mmprojDest
-                ) { [weak self] success in
+                self.downloadFile(url: Constants.localMmprojURL, destination: mmprojDest) { [weak self] success in
                     Task { @MainActor [weak self] in
                         guard let self else { return }
                         self.isDownloading = false
@@ -146,56 +140,28 @@ final class ModelDownloadManager: ObservableObject {
             return
         }
 
-        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: .main)
-        let task = session.downloadTask(with: url) { [weak self] tempURL, _, downloadError in
-            Task { @MainActor in
-                guard let self else { return }
+        currentDestination = destination
+        currentCompletion = completion
+        downloadStartTime = Date()
+        lastSpeedUpdate = Date()
+        lastSpeedBytes = 0
 
-                if let downloadError {
-                    self.error = downloadError.localizedDescription
-                    self.isDownloading = false
-                    completion(false)
-                    return
-                }
-
-                guard let tempURL else {
-                    self.error = "Download fehlgeschlagen"
-                    self.isDownloading = false
-                    completion(false)
-                    return
-                }
-
-                do {
-                    if FileManager.default.fileExists(atPath: destination.path) {
-                        try FileManager.default.removeItem(at: destination)
-                    }
-                    try FileManager.default.moveItem(at: tempURL, to: destination)
-                    completion(true)
-                } catch {
-                    self.error = error.localizedDescription
-                    self.isDownloading = false
-                    completion(false)
-                }
-            }
-        }
-
-        let observation = task.progress.observe(\.fractionCompleted) { [weak self] progressObj, _ in
-            Task { @MainActor in
-                self?.progress = progressObj.fractionCompleted
-                self?.downloadedBytes = progressObj.completedUnitCount
-                self?.totalBytes = progressObj.totalUnitCount
-            }
-        }
-
-        _progressObservation = observation
+        // Use delegate-based session for reliable progress
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForResource = 3600 // 1 hour for large files
+        session = URLSession(configuration: config, delegate: DownloadDelegate(manager: self), delegateQueue: .main)
+        let task = session!.downloadTask(with: url)
         task.resume()
         downloadTask = task
     }
 
     func cancelDownload() {
         downloadTask?.cancel()
+        session?.invalidateAndCancel()
         isDownloading = false
         progress = 0
+        downloadedBytes = 0
+        speedBytesPerSec = 0
     }
 
     func deleteModel() {
@@ -204,13 +170,109 @@ final class ModelDownloadManager: ObservableObject {
         isModelAvailable = false
     }
 
-    var formattedProgress: String {
-        let downloadedMB = Double(downloadedBytes) / 1_000_000
-        let totalMB = Double(totalBytes) / 1_000_000
-        let phase = downloadPhase.rawValue
-        if totalMB > 0 {
-            return String(format: "%@ — %.0f / %.0f MB", phase, downloadedMB, totalMB)
+    // Called by delegate
+    fileprivate func handleProgress(bytesWritten: Int64, totalWritten: Int64, totalExpected: Int64) {
+        downloadedBytes = totalWritten
+        if totalExpected > 0 {
+            totalBytes = totalExpected
+            progress = Double(totalWritten) / Double(totalExpected)
         }
-        return String(format: "%@ — %.0f MB", phase, downloadedMB)
+
+        // Calculate speed every 2 seconds
+        let now = Date()
+        if let lastUpdate = lastSpeedUpdate, now.timeIntervalSince(lastUpdate) >= 2.0 {
+            let byteDiff = totalWritten - lastSpeedBytes
+            let timeDiff = now.timeIntervalSince(lastUpdate)
+            if timeDiff > 0 {
+                speedBytesPerSec = Double(byteDiff) / timeDiff
+            }
+            lastSpeedUpdate = now
+            lastSpeedBytes = totalWritten
+        }
+    }
+
+    fileprivate func handleCompletion(tempURL: URL?, error: Error?) {
+        if let error {
+            self.error = error.localizedDescription
+            self.isDownloading = false
+            currentCompletion?(false)
+            return
+        }
+
+        guard let tempURL, let destination = currentDestination else {
+            self.error = "Download fehlgeschlagen"
+            self.isDownloading = false
+            currentCompletion?(false)
+            return
+        }
+
+        do {
+            if FileManager.default.fileExists(atPath: destination.path) {
+                try FileManager.default.removeItem(at: destination)
+            }
+            try FileManager.default.moveItem(at: tempURL, to: destination)
+            currentCompletion?(true)
+        } catch {
+            self.error = error.localizedDescription
+            self.isDownloading = false
+            currentCompletion?(false)
+        }
+    }
+
+    var formattedProgress: String {
+        let dlMB = Double(downloadedBytes) / 1_000_000
+        let totalMB = Double(totalBytes) / 1_000_000
+        let speedMB = speedBytesPerSec / 1_000_000
+        let phase = downloadPhase.rawValue
+
+        var text: String
+        if totalMB > 0 {
+            let pct = Int(progress * 100)
+            text = String(format: "%@ — %.0f / %.0f MB (%d%%)", phase, dlMB, totalMB, pct)
+        } else {
+            text = String(format: "%@ — %.0f MB", phase, dlMB)
+        }
+
+        if speedMB > 0.01 {
+            text += String(format: " · %.1f MB/s", speedMB)
+        }
+
+        return text
+    }
+}
+
+// MARK: - URLSession Delegate (for reliable download progress)
+
+private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
+    private weak var manager: ModelDownloadManager?
+
+    init(manager: ModelDownloadManager) {
+        self.manager = manager
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        Task { @MainActor in
+            self.manager?.handleProgress(bytesWritten: bytesWritten, totalWritten: totalBytesWritten, totalExpected: totalBytesExpectedToWrite)
+        }
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        // Copy to temp because the file gets deleted after this callback
+        let tempDir = FileManager.default.temporaryDirectory
+        let tempFile = tempDir.appendingPathComponent(UUID().uuidString + ".gguf")
+        try? FileManager.default.copyItem(at: location, to: tempFile)
+
+        Task { @MainActor in
+            self.manager?.handleCompletion(tempURL: tempFile, error: nil)
+        }
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        guard let error else { return }
+        // Ignore cancellation
+        if (error as NSError).code == NSURLErrorCancelled { return }
+        Task { @MainActor in
+            self.manager?.handleCompletion(tempURL: nil, error: error)
+        }
     }
 }

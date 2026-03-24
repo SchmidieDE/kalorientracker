@@ -221,6 +221,9 @@ struct ProfileView: View {
                     Text(downloadManager.formattedProgress)
                         .font(.caption)
                         .foregroundStyle(Constants.Colors.textSecondary)
+                    Text("Download läuft im Hintergrund weiter")
+                        .font(.caption2)
+                        .foregroundStyle(Constants.Colors.textSecondary.opacity(0.6))
                     SecondaryButton(title: "Abbrechen") {
                         downloadManager.cancelDownload()
                     }
