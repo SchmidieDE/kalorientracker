@@ -9,16 +9,14 @@ struct ManualFoodEntrySheet: View {
     @State private var protein = ""
     @State private var carbs = ""
     @State private var fat = ""
-    @State private var portionDescription = ""
-    @State private var mealCategory: MealCategory = MealCategory.fromCurrentTime()
     @FocusState private var focusedField: Field?
 
     private enum Field: Hashable {
-        case name, calories, protein, carbs, fat, portion
+        case name, calories, protein, carbs, fat
     }
 
     private var isValid: Bool {
-        !name.isEmpty && Int(calories) != nil && Int(calories)! > 0
+        !name.isEmpty
     }
 
     var body: some View {
@@ -28,48 +26,23 @@ struct ManualFoodEntrySheet: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Meal category picker
-                        HStack(spacing: 8) {
-                            ForEach(MealCategory.allCases) { cat in
-                                Button {
-                                    mealCategory = cat
-                                } label: {
-                                    VStack(spacing: 4) {
-                                        Image(systemName: cat.icon)
-                                            .font(.caption)
-                                        Text(cat.label)
-                                            .font(.caption2)
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 10)
-                                    .foregroundStyle(mealCategory == cat ? .white : Constants.Colors.textSecondary)
-                                    .background(mealCategory == cat ? AnyShapeStyle(Constants.Colors.accentGradient) : AnyShapeStyle(Constants.Colors.surface))
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                                }
-                            }
-                        }
-
                         // Name
                         EntryField(title: "Name", placeholder: "z.B. Haferflocken mit Milch", text: $name)
                             .focused($focusedField, equals: .name)
 
-                        // Calories
-                        EntryField(title: "Kalorien (kcal)", placeholder: "z.B. 350", text: $calories, keyboardType: .numberPad)
+                        // Calories (optional)
+                        EntryField(title: "Kalorien (kcal)", placeholder: "optional", text: $calories, keyboardType: .numberPad)
                             .focused($focusedField, equals: .calories)
 
-                        // Macros
+                        // Macros (all optional)
                         HStack(spacing: 12) {
-                            EntryField(title: "Protein (g)", placeholder: "0", text: $protein, keyboardType: .decimalPad)
+                            EntryField(title: "Protein (g)", placeholder: "–", text: $protein, keyboardType: .decimalPad)
                                 .focused($focusedField, equals: .protein)
-                            EntryField(title: "Kohlenhydrate (g)", placeholder: "0", text: $carbs, keyboardType: .decimalPad)
+                            EntryField(title: "Carbs (g)", placeholder: "–", text: $carbs, keyboardType: .decimalPad)
                                 .focused($focusedField, equals: .carbs)
-                            EntryField(title: "Fett (g)", placeholder: "0", text: $fat, keyboardType: .decimalPad)
+                            EntryField(title: "Fett (g)", placeholder: "–", text: $fat, keyboardType: .decimalPad)
                                 .focused($focusedField, equals: .fat)
                         }
-
-                        // Portion
-                        EntryField(title: "Portion (optional)", placeholder: "z.B. 1 Schüssel", text: $portionDescription)
-                            .focused($focusedField, equals: .portion)
 
                         // Save button
                         GradientButton("Speichern", icon: "checkmark") {
@@ -107,9 +80,9 @@ struct ManualFoodEntrySheet: View {
             fat: Double(fat) ?? 0,
             confidence: 1.0,
             imageData: nil,
-            portionDescription: portionDescription.isEmpty ? "1 Portion" : portionDescription,
+            portionDescription: "1 Portion",
             analysisSource: .cloud,
-            mealCategory: mealCategory
+            mealCategory: MealCategory.fromCurrentTime()
         )
         onSave(entry)
         dismiss()
