@@ -48,54 +48,13 @@ final class ModelDownloadManager: NSObject, ObservableObject {
         documentsDir.appendingPathComponent(Constants.localMmprojName)
     }
 
-    // MARK: - Dev bypass
-
-    #if DEBUG
-    private var devModelsDir: URL? {
-        let sourceFile = URL(fileURLWithPath: #filePath)
-        let repoRoot = sourceFile
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let modelsDir = repoRoot.appendingPathComponent("models")
-        guard FileManager.default.fileExists(atPath: modelsDir.path) else { return nil }
-        return modelsDir
-    }
-
-    private var devModelPath: URL? {
-        guard let dir = devModelsDir else { return nil }
-        let path = dir.appendingPathComponent(Constants.localModelName)
-        return FileManager.default.fileExists(atPath: path.path) ? path : nil
-    }
-
-    private var devMmprojPath: URL? {
-        guard let dir = devModelsDir else { return nil }
-        let path = dir.appendingPathComponent(Constants.localMmprojName)
-        return FileManager.default.fileExists(atPath: path.path) ? path : nil
-    }
-    #endif
-
-    var resolvedModelPath: URL {
-        #if DEBUG
-        if let devPath = devModelPath { return devPath }
-        #endif
-        return modelPath
-    }
-
-    var resolvedMmprojPath: URL {
-        #if DEBUG
-        if let devPath = devMmprojPath { return devPath }
-        #endif
-        return mmprojPath
-    }
+    var resolvedModelPath: URL { modelPath }
+    var resolvedMmprojPath: URL { mmprojPath }
 
     // MARK: - File checks
 
     func bothFilesExist() -> Bool {
-        #if DEBUG
-        if devModelPath != nil && devMmprojPath != nil { return true }
-        #endif
-        return FileManager.default.fileExists(atPath: modelPath.path)
+        FileManager.default.fileExists(atPath: modelPath.path)
             && FileManager.default.fileExists(atPath: mmprojPath.path)
     }
 

@@ -306,9 +306,25 @@ struct ProfileView: View {
                 .font(.headline)
                 .foregroundStyle(.white)
 
-            Toggle("Kalorienziel berechnen", isOn: Bindable(profile).useComputedTarget)
-                .tint(Constants.Colors.gradientStart)
-                .foregroundStyle(.white)
+            // Calorie goal — always editable
+            ProfileSlider(title: "Kalorienziel", value: Binding(
+                get: { Double(profile.targetCalories) },
+                set: {
+                    profile.targetCalories = Int($0)
+                    profile.useComputedTarget = false
+                }
+            ), range: 1000...5000, unit: "kcal", format: "%.0f")
+
+            Button {
+                profile.useComputedTarget = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.counterclockwise")
+                    Text("Automatisch berechnen (\(profile.useComputedTarget ? "\(Int(profile.tdee * profile.goal.calorieFactor)) kcal" : "aus"))")
+                }
+                .font(.caption)
+                .foregroundStyle(profile.useComputedTarget ? Constants.Colors.gradientStart : Constants.Colors.textSecondary)
+            }
 
             // Gender
             HStack {
@@ -368,48 +384,30 @@ struct ProfileView: View {
 
             ProfileSlider(title: "Training/Woche", value: Bindable(profile).weeklyTrainingHours, range: 0...20, unit: "Std", format: "%.1f")
 
-            if !profile.useComputedTarget {
-                ProfileSlider(title: "Kalorienziel", value: Binding(
-                    get: { Double(profile.targetCalories) },
-                    set: { profile.targetCalories = Int($0) }
-                ), range: 1000...5000, unit: "kcal", format: "%.0f")
-            }
-
             // Calculated values
-            if profile.useComputedTarget {
-                VStack(spacing: 8) {
-                    HStack {
-                        Text("Grundumsatz (BMR)")
-                            .font(.caption)
-                            .foregroundStyle(Constants.Colors.textSecondary)
-                        Spacer()
-                        Text("\(Int(profile.bmr)) kcal")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.white)
-                    }
-                    HStack {
-                        Text("Gesamtbedarf (TDEE)")
-                            .font(.caption)
-                            .foregroundStyle(Constants.Colors.textSecondary)
-                        Spacer()
-                        Text("\(Int(profile.tdee)) kcal")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.white)
-                    }
-                    HStack {
-                        Text("Ziel: \(profile.goal.label)")
-                            .font(.caption)
-                            .foregroundStyle(Constants.Colors.textSecondary)
-                        Spacer()
-                        Text("\(profile.recommendedCalories) kcal")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Constants.Colors.gradientStart)
-                    }
+            VStack(spacing: 8) {
+                HStack {
+                    Text("Grundumsatz (BMR)")
+                        .font(.caption)
+                        .foregroundStyle(Constants.Colors.textSecondary)
+                    Spacer()
+                    Text("\(Int(profile.bmr)) kcal")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
                 }
-                .padding(12)
-                .background(Constants.Colors.surface)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                HStack {
+                    Text("Gesamtbedarf (TDEE)")
+                        .font(.caption)
+                        .foregroundStyle(Constants.Colors.textSecondary)
+                    Spacer()
+                    Text("\(Int(profile.tdee)) kcal")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                }
             }
+            .padding(12)
+            .background(Constants.Colors.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .padding(20)
         .glassCard()
