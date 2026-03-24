@@ -109,25 +109,30 @@ final class ModelDownloadManager: ObservableObject {
         downloadPhase = .model
 
         // Download model first, then mmproj
+        let mmprojDest = mmprojPath
         downloadFile(
             url: Constants.localModelURL,
             destination: modelPath
         ) { [weak self] success in
-            guard let self, success else { return }
-            self.downloadPhase = .mmproj
-            self.progress = 0
-            self.downloadedBytes = 0
-            self.totalBytes = 0
+            Task { @MainActor [weak self] in
+                guard let self, success else { return }
+                self.downloadPhase = .mmproj
+                self.progress = 0
+                self.downloadedBytes = 0
+                self.totalBytes = 0
 
-            self.downloadFile(
-                url: Constants.localMmprojURL,
-                destination: self.mmprojPath
-            ) { [weak self] success in
-                guard let self else { return }
-                self.isDownloading = false
-                if success {
-                    self.isModelAvailable = true
-                    self.progress = 1.0
+                self.downloadFile(
+                    url: Constants.localMmprojURL,
+                    destination: mmprojDest
+                ) { [weak self] success in
+                    Task { @MainActor [weak self] in
+                        guard let self else { return }
+                        self.isDownloading = false
+                        if success {
+                            self.isModelAvailable = true
+                            self.progress = 1.0
+                        }
+                    }
                 }
             }
         }

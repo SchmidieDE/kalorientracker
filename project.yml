@@ -5,11 +5,6 @@ options:
     iOS: "17.0"
   xcodeVersion: "26.3"
 
-packages:
-  llama:
-    url: https://github.com/ggml-org/llama.cpp
-    branch: master
-
 settings:
   base:
     DEVELOPMENT_TEAM: 9STPCR2ZSB
@@ -23,9 +18,6 @@ targets:
     platform: iOS
     sources:
       - path: Kalorientracker
-    dependencies:
-      - package: llama
-        product: llama
     settings:
       base:
         INFOPLIST_KEY_NSCameraUsageDescription: "Kalorientracker benötigt Zugriff auf die Kamera, um dein Essen zu fotografieren und die Kalorien zu analysieren."
