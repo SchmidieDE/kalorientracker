@@ -89,10 +89,10 @@ struct PhotoReviewView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 16)
                 } else if let result {
-                    AnalysisResultCard(result: result, onSave: { mealCategory in
+                    AnalysisResultCard(result: result, onSave: { resolvedResult, mealCategory in
                         let impact = UINotificationFeedbackGenerator()
                         impact.notificationOccurred(.success)
-                        onSave(result, mealCategory)
+                        onSave(resolvedResult, mealCategory)
                     }, onDiscard: {
                         dismiss()
                     })

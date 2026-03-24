@@ -54,6 +54,7 @@ Aufgabe:
 1. Identifiziere ALLE sichtbaren Lebensmittel auf dem Foto
 2. Schätze die Portionsgröße basierend auf visuellen Hinweisen
 3. Berechne die Nährwerte für die GESAMTE sichtbare Portion
+4. Wenn du dir NICHT sicher bist (confidence < 0.8), gib 2-3 alternative Möglichkeiten an
 
 Wichtige Regeln:
 - Wenn mehrere Lebensmittel sichtbar sind, fasse sie zu EINEM Eintrag zusammen
@@ -62,6 +63,8 @@ Wichtige Regeln:
 - Die Confidence (0.0-1.0) soll widerspiegeln, wie sicher du dir bei der Identifikation bist
 - Wenn das Bild kein Essen zeigt, setze confidence auf 0.0 und calories auf 0
 - Gib einen kurzen, hilfreichen Ernährungstipp zum Essen
+- Bei niedriger Confidence: Gib "alternatives" mit 2-3 möglichen Lebensmitteln inkl. Nährwerte an
+- Bei hoher Confidence (>= 0.8): Setze "alternatives" auf ein leeres Array []
 
 Antworte NUR im geforderten JSON-Format.`;
 
@@ -84,7 +87,23 @@ Antworte NUR im geforderten JSON-Format.`;
             fat: { type: 'NUMBER' },
             confidence: { type: 'NUMBER' },
             portionDescription: { type: 'STRING' },
-            suggestions: { type: 'STRING' }
+            suggestions: { type: 'STRING' },
+            emoji: { type: 'STRING' },
+            alternatives: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  name: { type: 'STRING' },
+                  calories: { type: 'INTEGER' },
+                  protein: { type: 'NUMBER' },
+                  carbs: { type: 'NUMBER' },
+                  fat: { type: 'NUMBER' },
+                  emoji: { type: 'STRING' }
+                },
+                required: ['name', 'calories', 'protein', 'carbs', 'fat']
+              }
+            }
           },
           required: ['name', 'calories', 'protein', 'carbs', 'fat', 'confidence', 'portionDescription']
         }

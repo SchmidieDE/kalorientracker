@@ -191,9 +191,10 @@ struct TodayView: View {
                         analysisSource: analyzer.analysisSource,
                         mealCategory: mealCategory
                     )
+                    entry.isFavorite = true
                     modelContext.insert(entry)
                     showResult = false
-                    ToastManager.shared.show("Eintrag gespeichert")
+                    ToastManager.shared.show("Gespeichert & zu Favoriten hinzugefügt", icon: "star.fill", style: .success)
                 }
             }
         }
