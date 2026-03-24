@@ -1,8 +1,10 @@
 import SwiftUI
 import SwiftData
+import AuthenticationServices
 
 struct OnboardingView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var authManager: AuthManager
     @Query private var profiles: [UserProfile]
     @State private var currentPage = 0
     @State private var age: Double = 30
@@ -12,7 +14,7 @@ struct OnboardingView: View {
     @State private var activityLevel = 2
     @State private var goal: NutritionGoal = .maintain
 
-    private let totalPages = 4
+    private let totalPages = 5
     private var profile: UserProfile? { profiles.first }
 
     var body: some View {
@@ -36,16 +38,28 @@ struct OnboardingView: View {
                     goalPage.tag(1)
                     personalDataPage.tag(2)
                     activityPage.tag(3)
+                    loginPage.tag(4)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(.easeInOut(duration: 0.3), value: currentPage)
 
                 // Bottom button
                 VStack(spacing: 12) {
-                    GradientButton(currentPage == 3 ? "Los geht's!" : "Weiter", icon: currentPage == 3 ? "checkmark" : "arrow.right") {
+                    if currentPage == 4 && !authManager.isLoggedIn && !authManager.isLoading {
+                        SignInWithAppleButton(.signIn) { request in
+                            request.requestedScopes = [.fullName, .email]
+                        } onCompletion: { result in
+                            authManager.handleAppleSignIn(result: result)
+                        }
+                        .signInWithAppleButtonStyle(.white)
+                        .frame(height: 50)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                    }
+
+                    GradientButton(currentPage == 4 ? (authManager.isLoggedIn ? "Los geht's!" : "Überspringen") : "Weiter", icon: currentPage == 4 ? (authManager.isLoggedIn ? "checkmark" : "arrow.right") : "arrow.right") {
                         let impact = UIImpactFeedbackGenerator(style: .medium)
                         impact.impactOccurred()
-                        if currentPage < 3 {
+                        if currentPage < 4 {
                             withAnimation { currentPage += 1 }
                         } else {
                             completeOnboarding()
@@ -250,6 +264,69 @@ struct OnboardingView: View {
             .background(Constants.Colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .padding(.horizontal, 24)
+
+            Spacer()
+        }
+    }
+
+    private var loginPage: some View {
+        VStack(spacing: 32) {
+            Spacer()
+
+            ZStack {
+                Circle()
+                    .fill(Constants.Colors.gradientStart.opacity(0.15))
+                    .frame(width: 120, height: 120)
+                Image(systemName: "person.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(Constants.Colors.accentGradient)
+            }
+
+            VStack(spacing: 8) {
+                Text("Anmelden")
+                    .font(.title.bold())
+                    .foregroundStyle(.white)
+                Text("Optional — für Cloud-KI\nund Datensicherung")
+                    .font(.subheadline)
+                    .foregroundStyle(Constants.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            if authManager.isLoggedIn {
+                VStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 40))
+                        .foregroundStyle(Constants.Colors.success)
+                    Text("Angemeldet als")
+                        .font(.subheadline)
+                        .foregroundStyle(Constants.Colors.textSecondary)
+                    Text(authManager.user?.displayName ?? authManager.user?.email ?? "")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                }
+                .padding(20)
+                .glassCard()
+                .padding(.horizontal, 24)
+            } else if authManager.isLoading {
+                ProgressView()
+                    .tint(Constants.Colors.gradientStart)
+                    .scaleEffect(1.5)
+            } else {
+                VStack(spacing: 12) {
+                    FeatureRow(icon: "cloud.fill", text: "Cloud-KI für bessere Erkennung")
+                    FeatureRow(icon: "arrow.triangle.2.circlepath", text: "Daten geräteübergreifend sync")
+                    FeatureRow(icon: "lock.shield", text: "Sichere Apple-Anmeldung")
+                }
+                .padding(.horizontal, 32)
+            }
+
+            if let error = authManager.error {
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(Constants.Colors.danger)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+            }
 
             Spacer()
         }
