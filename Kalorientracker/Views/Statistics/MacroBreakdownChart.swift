@@ -17,40 +17,61 @@ struct MacroBreakdownChart: View {
         ]
     }
 
+    private var totalCalories: Int { data.reduce(0) { $0 + $1.calories } }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Makronährstoffe")
                 .font(.headline)
                 .foregroundStyle(.white)
 
             if total > 0 {
-                HStack(spacing: 24) {
+                VStack(spacing: 20) {
                     Chart(macros, id: \.name) { macro in
                         SectorMark(
                             angle: .value(macro.name, macro.value),
-                            innerRadius: .ratio(0.6),
+                            innerRadius: .ratio(0.55),
                             angularInset: 2
                         )
                         .foregroundStyle(macro.color)
                         .cornerRadius(4)
+                        .annotation(position: .overlay) {
+                            if macro.value / total > 0.1 {
+                                Text("\(macro.value.cleanString)g")
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(.white)
+                            }
+                        }
                     }
-                    .frame(width: 140, height: 140)
+                    .chartBackground { _ in
+                        VStack(spacing: 2) {
+                            Text("\(totalCalories)")
+                                .font(.title3.bold())
+                                .foregroundStyle(.white)
+                            Text("kcal")
+                                .font(.caption2)
+                                .foregroundStyle(Constants.Colors.textSecondary)
+                        }
+                    }
+                    .frame(height: 200)
 
-                    VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 16) {
                         ForEach(macros, id: \.name) { macro in
-                            HStack(spacing: 8) {
+                            VStack(spacing: 4) {
                                 Circle()
                                     .fill(macro.color)
-                                    .frame(width: 10, height: 10)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(macro.name)
-                                        .font(.caption.weight(.medium))
-                                        .foregroundStyle(.white)
-                                    Text("\(macro.value.cleanString)g (\(Int(macro.value / total * 100))%)")
-                                        .font(.caption2)
-                                        .foregroundStyle(Constants.Colors.textSecondary)
-                                }
+                                    .frame(width: 12, height: 12)
+                                Text(macro.name)
+                                    .font(.caption2.weight(.medium))
+                                    .foregroundStyle(.white)
+                                Text("\(macro.value.cleanString)g")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(macro.color)
+                                Text("\(Int(macro.value / total * 100))%")
+                                    .font(.caption2)
+                                    .foregroundStyle(Constants.Colors.textSecondary)
                             }
+                            .frame(maxWidth: .infinity)
                         }
                     }
                 }

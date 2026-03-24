@@ -4,6 +4,7 @@ import Charts
 struct DailyCalorieChart: View {
     let data: [DailyData]
     let target: Int
+    let dayCount: Int
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -22,7 +23,7 @@ struct DailyCalorieChart: View {
                             ? Constants.Colors.danger.gradient
                             : Constants.Colors.gradientStart.gradient
                     )
-                    .cornerRadius(6)
+                    .cornerRadius(4)
                 }
 
                 RuleMark(y: .value("Ziel", target))
@@ -35,12 +36,38 @@ struct DailyCalorieChart: View {
                     }
             }
             .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) { value in
-                    AxisValueLabel {
-                        if let date = value.as(Date.self) {
-                            Text(date.dayOfWeek)
-                                .font(.caption2)
-                                .foregroundStyle(Constants.Colors.textSecondary)
+                if dayCount <= 7 {
+                    AxisMarks(values: .stride(by: .day)) { value in
+                        AxisValueLabel {
+                            if let date = value.as(Date.self) {
+                                Text(date.dayOfWeek)
+                                    .font(.caption2)
+                                    .foregroundStyle(Constants.Colors.textSecondary)
+                            }
+                        }
+                    }
+                } else if dayCount <= 30 {
+                    AxisMarks(values: .stride(by: .day, count: 5)) { value in
+                        AxisGridLine()
+                            .foregroundStyle(Constants.Colors.glassBorder)
+                        AxisValueLabel {
+                            if let date = value.as(Date.self) {
+                                Text(date.shortDate)
+                                    .font(.caption2)
+                                    .foregroundStyle(Constants.Colors.textSecondary)
+                            }
+                        }
+                    }
+                } else {
+                    AxisMarks(values: .stride(by: .month)) { value in
+                        AxisGridLine()
+                            .foregroundStyle(Constants.Colors.glassBorder)
+                        AxisValueLabel {
+                            if let date = value.as(Date.self) {
+                                Text(date.shortDate)
+                                    .font(.caption2)
+                                    .foregroundStyle(Constants.Colors.textSecondary)
+                            }
                         }
                     }
                 }

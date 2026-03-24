@@ -122,7 +122,7 @@ struct FavoritesSheet: View {
     }
 }
 
-private struct QuickAddRow: View {
+struct QuickAddRow: View {
     let entry: FoodEntry
     let onAdd: () -> Void
 

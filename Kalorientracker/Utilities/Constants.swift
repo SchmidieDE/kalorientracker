@@ -5,12 +5,37 @@ enum Constants {
     static let supabaseURL = "https://supabase-kalorientracker.webgantic.com"
     static let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcwNzM2Njk4LCJleHAiOjIwODYwOTY2OTh9.iDTVeUvL3pd0vLXWIgUFi1g5M5wDyxEF6fljvYuZC18"
 
-    // GGUF model for on-device inference (Qwen3.5 4B Vision — best for iPhone)
-    static let localModelName = "Qwen3.5-4B.Q4_K_M.gguf"
-    static let localMmprojName = "Qwen3.5-4B-mmproj.gguf"
-    static let localModelURL = "https://huggingface.co/bjivanovich/Qwen3.5-4B-Vision-GGUF/resolve/main/Qwen3.5-4B.Q4_K_M.gguf"
-    static let localMmprojURL = "https://huggingface.co/bjivanovich/Qwen3.5-4B-Vision-GGUF/resolve/main/Qwen3.5-4B.BF16-mmproj.gguf"
-    static let localModelSize: Int64 = 2_800_000_000 // ~2.8GB
+    // GGUF models for on-device inference (Qwen3.5 Vision)
+    // 4B variant — better quality, needs ≥6GB RAM (iPhone 15 Pro+)
+    static let largeModelName = "Qwen3.5-4B.Q4_K_M.gguf"
+    static let largeMmprojName = "Qwen3.5-4B-mmproj.gguf"
+    static let largeModelURL = "https://huggingface.co/bjivanovich/Qwen3.5-4B-Vision-GGUF/resolve/main/Qwen3.5-4B.Q4_K_M.gguf"
+    static let largeMmprojURL = "https://huggingface.co/bjivanovich/Qwen3.5-4B-Vision-GGUF/resolve/main/Qwen3.5-4B-mmproj.gguf"
+    static let largeModelSize: Int64 = 2_800_000_000
+
+    // 2B variant — faster, works on ≥4GB RAM (iPhone 12+)
+    static let smallModelName = "Qwen3.5-2B.Q4_K_M.gguf"
+    static let smallMmprojName = "Qwen3.5-2B-mmproj.gguf"
+    static let smallModelURL = "https://huggingface.co/bjivanovich/Qwen3.5-2B-Vision-GGUF/resolve/main/Qwen3.5-2B.Q4_K_M.gguf"
+    static let smallMmprojURL = "https://huggingface.co/bjivanovich/Qwen3.5-2B-Vision-GGUF/resolve/main/Qwen3.5-2B-mmproj.gguf"
+    static let smallModelSize: Int64 = 1_300_000_000
+
+    // Auto-select based on device RAM
+    static var localModelName: String {
+        ProcessInfo.processInfo.physicalMemory >= 6 * 1024 * 1024 * 1024 ? largeModelName : smallModelName
+    }
+    static var localMmprojName: String {
+        ProcessInfo.processInfo.physicalMemory >= 6 * 1024 * 1024 * 1024 ? largeMmprojName : smallMmprojName
+    }
+    static var localModelURL: String {
+        ProcessInfo.processInfo.physicalMemory >= 6 * 1024 * 1024 * 1024 ? largeModelURL : smallModelURL
+    }
+    static var localMmprojURL: String {
+        ProcessInfo.processInfo.physicalMemory >= 6 * 1024 * 1024 * 1024 ? largeMmprojURL : smallMmprojURL
+    }
+    static var localModelSize: Int64 {
+        ProcessInfo.processInfo.physicalMemory >= 6 * 1024 * 1024 * 1024 ? largeModelSize : smallModelSize
+    }
 
     enum Colors {
         static let background = Color(hex: 0x0A0E1A)

@@ -5,7 +5,7 @@ import AuthenticationServices
 struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var profiles: [UserProfile]
-    @StateObject private var downloadManager = ModelDownloadManager()
+    @ObservedObject private var downloadManager = ModelDownloadManager.shared
     @EnvironmentObject var authManager: AuthManager
 
     private var profile: UserProfile? { profiles.first }
@@ -208,7 +208,9 @@ struct ProfileView: View {
                 }
             }
 
-            Text("Qwen3.5-4B Vision (~2.8 GB)")
+            Text(ProcessInfo.processInfo.physicalMemory >= 6 * 1024 * 1024 * 1024
+                 ? "Qwen3.5-4B Vision (~2.8 GB)"
+                 : "Qwen3.5-2B Vision (~1.3 GB)")
                 .font(.subheadline)
                 .foregroundStyle(Constants.Colors.textSecondary)
 

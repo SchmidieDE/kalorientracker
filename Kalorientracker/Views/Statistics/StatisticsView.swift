@@ -26,6 +26,7 @@ struct DailyData: Identifiable {
 }
 
 struct StatisticsView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \FoodEntry.timestamp, order: .reverse) private var allEntries: [FoodEntry]
     @Query private var profiles: [UserProfile]
     @State private var selectedRange: TimeRange = .week
@@ -70,6 +71,34 @@ struct StatisticsView: View {
         dailyData.filter { $0.calories > 0 }.count
     }
 
+    private var favorites: [FoodEntry] {
+        allEntries.filter { $0.isFavorite }
+    }
+
+    private var uniqueFavorites: [FoodEntry] {
+        var seen = Set<String>()
+        return favorites.filter { seen.insert($0.name).inserted }
+    }
+
+    private func addFavoriteAsEntry(_ source: FoodEntry) {
+        let entry = FoodEntry(
+            name: source.name,
+            calories: source.calories,
+            protein: source.protein,
+            carbs: source.carbs,
+            fat: source.fat,
+            confidence: 1.0,
+            imageData: source.imageData,
+            portionDescription: source.portionDescription,
+            suggestion: source.suggestion,
+            emoji: source.emoji,
+            analysisSource: source.source,
+            mealCategory: MealCategory.fromCurrentTime()
+        )
+        modelContext.insert(entry)
+        ToastManager.shared.show("Eintrag hinzugefügt")
+    }
+
     var body: some View {
         ZStack {
             Constants.Colors.background.ignoresSafeArea()
@@ -102,12 +131,42 @@ struct StatisticsView: View {
                     .padding(.horizontal)
 
                     // Daily calorie chart
-                    DailyCalorieChart(data: dailyData, target: targetCalories)
+                    DailyCalorieChart(data: dailyData, target: targetCalories, dayCount: selectedRange.days)
                         .padding(.horizontal)
 
                     // Macro breakdown
                     MacroBreakdownChart(data: dailyData)
                         .padding(.horizontal)
+
+                    // Saved favorites
+                    if !favorites.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Image(systemName: "star.fill")
+                                    .foregroundStyle(Constants.Colors.warning)
+                                Text("Gespeicherte Favoriten")
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                                Spacer()
+                                Text("\(favorites.count)")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(Constants.Colors.textSecondary)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Constants.Colors.surface)
+                                    .clipShape(Capsule())
+                            }
+
+                            ForEach(uniqueFavorites) { entry in
+                                QuickAddRow(entry: entry) {
+                                    addFavoriteAsEntry(entry)
+                                }
+                            }
+                        }
+                        .padding(20)
+                        .glassCard()
+                        .padding(.horizontal)
+                    }
                 }
                 .padding(.bottom, 40)
             }

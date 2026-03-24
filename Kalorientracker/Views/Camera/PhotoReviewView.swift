@@ -61,7 +61,7 @@ struct PhotoReviewView: View {
 
                 // Loading or Result
                 if analyzer.isAnalyzing {
-                    ShimmerLoadingView(text: "Analysiere dein Essen...")
+                    ShimmerLoadingView(text: aiMode == .localOnly ? "On-Device Analyse..." : "Analysiere dein Essen...")
                         .padding()
                         .transition(.opacity)
                 } else if let error = analyzer.lastError {
@@ -74,6 +74,7 @@ struct PhotoReviewView: View {
                             .font(.body)
                             .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
                         GradientButton("Nochmal versuchen", icon: "arrow.clockwise") {
                             startAnalysis()
                         }
