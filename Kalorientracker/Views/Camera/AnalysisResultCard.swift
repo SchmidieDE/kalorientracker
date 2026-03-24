@@ -14,7 +14,6 @@ struct AnalysisResultCard: View {
         result.confidence < 0.8 && !(result.alternatives ?? []).isEmpty
     }
 
-    // Detect if drink based on portion description or name
     private var isDrink: Bool {
         let text = (result.portionDescription + " " + result.name).lowercased()
         return text.contains("ml") || text.contains("liter") || text.contains("glas")
@@ -100,31 +99,29 @@ struct AnalysisResultCard: View {
                 .foregroundStyle(Constants.Colors.textSecondary)
             }
 
-            // Drink amount slider
+            // Drink slider (only slider, no quick buttons)
             if isDrink {
-                drinkSlider
+                VStack(spacing: 6) {
+                    HStack {
+                        Text("Menge")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Text(drinkAmountLabel)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Constants.Colors.gradientStart)
+                    }
+                    Slider(value: $portionMultiplier, in: 0.1...3.0, step: 0.1)
+                        .tint(Constants.Colors.gradientStart)
+                }
+                .padding(10)
+                .background(Constants.Colors.surface.opacity(0.5))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
 
             // Alternatives
             if isUncertain {
                 alternativesSection
-            }
-
-            // Suggestion
-            if let suggestion = result.suggestions, !suggestion.isEmpty {
-                HStack(alignment: .top, spacing: 6) {
-                    Image(systemName: "lightbulb.fill")
-                        .foregroundStyle(Constants.Colors.warning)
-                        .font(.caption2)
-                    Text(suggestion)
-                        .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.8))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(10)
-                .background(Constants.Colors.warning.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
 
             // Buttons
@@ -158,75 +155,16 @@ struct AnalysisResultCard: View {
         )
     }
 
-    // MARK: - Drink Slider
-
-    @ViewBuilder
-    private var drinkSlider: some View {
-        VStack(spacing: 6) {
-            HStack {
-                Text("Menge anpassen")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.white)
-                Spacer()
-                Text(drinkAmountLabel)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Constants.Colors.gradientStart)
-            }
-
-            // Quick buttons
-            HStack(spacing: 6) {
-                ForEach([0.25, 0.5, 1.0, 1.5, 2.0], id: \.self) { mult in
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.2)) { portionMultiplier = mult }
-                    } label: {
-                        Text(drinkLabel(for: mult))
-                            .font(.caption2.weight(.medium))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 6)
-                            .foregroundStyle(portionMultiplier == mult ? .white : Constants.Colors.textSecondary)
-                            .background(portionMultiplier == mult ? AnyShapeStyle(Constants.Colors.accentGradient) : AnyShapeStyle(Constants.Colors.surface))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-            }
-
-            Slider(value: $portionMultiplier, in: 0.1...3.0, step: 0.1)
-                .tint(Constants.Colors.gradientStart)
-        }
-        .padding(10)
-        .background(Constants.Colors.surface.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-
     private var drinkAmountLabel: String {
-        // Try to extract ml from portion description
         let text = result.portionDescription.lowercased()
         if let range = text.range(of: "\\d+\\s*ml", options: .regularExpression) {
             let mlStr = text[range].filter { $0.isNumber }
-            if let ml = Int(mlStr) {
-                return "\(Int(Double(ml) * portionMultiplier)) ml"
-            }
+            if let ml = Int(mlStr) { return "\(Int(Double(ml) * portionMultiplier)) ml" }
         }
         if text.contains("liter") || text.contains("1 l") {
             return "\(Int(1000 * portionMultiplier)) ml"
         }
         return "\(Int(portionMultiplier * 100))%"
-    }
-
-    private func drinkLabel(for mult: Double) -> String {
-        let text = result.portionDescription.lowercased()
-        if let range = text.range(of: "\\d+\\s*ml", options: .regularExpression) {
-            let mlStr = text[range].filter { $0.isNumber }
-            if let ml = Int(mlStr) {
-                let amount = Int(Double(ml) * mult)
-                return amount >= 1000 ? "\(amount/1000)L" : "\(amount)ml"
-            }
-        }
-        if text.contains("liter") || text.contains("1 l") {
-            let amount = Int(1000 * mult)
-            return amount >= 1000 ? "\(amount/1000)L" : "\(amount)ml"
-        }
-        return "\(Int(mult * 100))%"
     }
 
     // MARK: - Alternatives

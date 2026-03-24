@@ -16,23 +16,19 @@ struct PhotoReviewView: View {
     private var aiMode: AIMode { profile?.aiMode ?? .cloudOnly }
 
     var body: some View {
-        ZStack {
-            Constants.Colors.background.ignoresSafeArea()
-
-            // Background image
+        ZStack(alignment: .bottom) {
+            // Background image — full screen
             Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
                 .overlay(Color.black.opacity(0.5))
-                .blur(radius: result != nil ? 8 : 0)
+                .blur(radius: (result != nil || analyzer.lastError != nil) ? 8 : 0)
 
-            VStack(spacing: 0) {
-                // Top bar
+            // Top bar — always visible
+            VStack {
                 HStack {
-                    Button {
-                        dismiss()
-                    } label: {
+                    Button { dismiss() } label: {
                         Image(systemName: "xmark")
                             .font(.title3.bold())
                             .foregroundStyle(.white)
@@ -41,8 +37,6 @@ struct PhotoReviewView: View {
                             .clipShape(Circle())
                     }
                     Spacer()
-
-                    // Source indicator
                     HStack(spacing: 6) {
                         Image(systemName: analyzer.analysisSource == .cloud ? "cloud.fill" : "iphone")
                             .font(.caption)
@@ -57,51 +51,67 @@ struct PhotoReviewView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
-
                 Spacer()
+            }
 
-                // Loading or Result
-                if analyzer.isAnalyzing {
-                    ShimmerLoadingView(text: aiMode == .localOnly ? "On-Device Analyse..." : "Analysiere dein Essen...")
-                        .padding()
-                        .transition(.opacity)
-                } else if let error = analyzer.lastError {
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.largeTitle)
-                            .foregroundStyle(Constants.Colors.warning)
-                        Text(error)
-                            .font(.body)
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
-                        GradientButton("Nochmal versuchen", icon: "arrow.clockwise") {
-                            startAnalysis()
-                        }
-                        SecondaryButton(title: "Abbrechen") {
-                            dismiss()
-                        }
-                    }
-                    .padding(20)
-                    .glassCard()
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
-                } else if let result {
-                    // Result card — bottom aligned, scrollable if tall
-                    ScrollView(.vertical, showsIndicators: false) {
-                        AnalysisResultCard(result: result, onSave: { resolvedResult, mealCategory in
-                            let impact = UINotificationFeedbackGenerator()
-                            impact.notificationOccurred(.success)
-                            onSave(resolvedResult, mealCategory)
-                        }, onDiscard: {
-                            dismiss()
-                        })
-                    }
-                    .frame(maxHeight: UIScreen.main.bounds.height * 0.65)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            // Content — bottom aligned
+            if analyzer.isAnalyzing {
+                // Loading inside blur card at bottom
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .tint(Constants.Colors.gradientStart)
+                        .scaleEffect(1.3)
+                    Text(aiMode == .localOnly ? "On-Device Analyse..." : "Analysiere dein Essen...")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.white)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 30)
+                .glassCard()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+
+            } else if let error = analyzer.lastError {
+                // Error card at bottom
+                VStack(spacing: 14) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.title2)
+                        .foregroundStyle(Constants.Colors.warning)
+                    Text(error)
+                        .font(.subheadline)
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                    GradientButton("Nochmal versuchen", icon: "arrow.clockwise") {
+                        startAnalysis()
+                    }
+                    SecondaryButton(title: "Abbrechen") {
+                        dismiss()
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(20)
+                .glassCard()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+
+            } else if let result {
+                // Result card at bottom
+                ScrollView(.vertical, showsIndicators: false) {
+                    AnalysisResultCard(result: result, onSave: { resolvedResult, mealCategory in
+                        let impact = UINotificationFeedbackGenerator()
+                        impact.notificationOccurred(.success)
+                        onSave(resolvedResult, mealCategory)
+                    }, onDiscard: {
+                        dismiss()
+                    })
+                }
+                .frame(maxHeight: UIScreen.main.bounds.height * 0.65)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .interactiveDismissDisabled(analyzer.isAnalyzing)
