@@ -1,8 +1,10 @@
 import SwiftUI
 import SwiftData
+import AuthenticationServices
 
 struct OnboardingView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var authManager: AuthManager
     @Query private var profiles: [UserProfile]
     @State private var currentPage = 0
     @State private var age: Double = 30
@@ -12,6 +14,7 @@ struct OnboardingView: View {
     @State private var activityLevel = 2
     @State private var goal: NutritionGoal = .maintain
 
+    private let totalPages = 5
     private var profile: UserProfile? { profiles.first }
 
     var body: some View {
@@ -21,7 +24,7 @@ struct OnboardingView: View {
             VStack(spacing: 0) {
                 // Progress dots
                 HStack(spacing: 8) {
-                    ForEach(0..<4) { i in
+                    ForEach(0..<totalPages, id: \.self) { i in
                         Capsule()
                             .fill(i <= currentPage ? Constants.Colors.gradientStart : Constants.Colors.surface)
                             .frame(width: i == currentPage ? 24 : 8, height: 8)
@@ -35,19 +38,37 @@ struct OnboardingView: View {
                     goalPage.tag(1)
                     personalDataPage.tag(2)
                     activityPage.tag(3)
+                    accountPage.tag(4)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(.easeInOut(duration: 0.3), value: currentPage)
 
                 // Bottom button
                 VStack(spacing: 12) {
-                    GradientButton(currentPage == 3 ? "Los geht's!" : "Weiter", icon: currentPage == 3 ? "checkmark" : "arrow.right") {
-                        let impact = UIImpactFeedbackGenerator(style: .medium)
-                        impact.impactOccurred()
-                        if currentPage < 3 {
-                            withAnimation { currentPage += 1 }
-                        } else {
+                    if currentPage == 4 {
+                        // Account page: show Sign In + Skip
+                        if !authManager.isLoggedIn {
+                            SignInWithAppleButton(.signIn) { request in
+                                request.requestedScopes = [.fullName, .email]
+                            } onCompletion: { result in
+                                authManager.handleAppleSignIn(result: result)
+                            }
+                            .signInWithAppleButtonStyle(.white)
+                            .frame(height: 50)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .padding(.horizontal, 24)
+                        }
+
+                        GradientButton(authManager.isLoggedIn ? "Los geht's!" : "Ohne Account starten", icon: authManager.isLoggedIn ? "checkmark" : "arrow.right") {
+                            let impact = UIImpactFeedbackGenerator(style: .medium)
+                            impact.impactOccurred()
                             completeOnboarding()
+                        }
+                    } else {
+                        GradientButton("Weiter", icon: "arrow.right") {
+                            let impact = UIImpactFeedbackGenerator(style: .medium)
+                            impact.impactOccurred()
+                            withAnimation { currentPage += 1 }
                         }
                     }
 
@@ -249,6 +270,72 @@ struct OnboardingView: View {
             .background(Constants.Colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .padding(.horizontal, 24)
+
+            Spacer()
+        }
+    }
+
+    private var accountPage: some View {
+        VStack(spacing: 32) {
+            Spacer()
+
+            ZStack {
+                Circle()
+                    .fill(Constants.Colors.gradientStart.opacity(0.15))
+                    .frame(width: 120, height: 120)
+
+                Image(systemName: "person.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(Constants.Colors.accentGradient)
+            }
+
+            VStack(spacing: 8) {
+                Text("Account erstellen?")
+                    .font(.title.bold())
+                    .foregroundStyle(.white)
+                Text("Optional — sichere deine Daten\nund nutze die Cloud-KI")
+                    .font(.subheadline)
+                    .foregroundStyle(Constants.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            if authManager.isLoggedIn {
+                // Already logged in
+                VStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 40))
+                        .foregroundStyle(Constants.Colors.success)
+                    Text("Angemeldet als")
+                        .font(.subheadline)
+                        .foregroundStyle(Constants.Colors.textSecondary)
+                    Text(authManager.user?.displayName ?? authManager.user?.email ?? "")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                }
+                .padding(20)
+                .glassCard()
+                .padding(.horizontal, 24)
+            } else if authManager.isLoading {
+                ProgressView()
+                    .tint(Constants.Colors.gradientStart)
+                    .scaleEffect(1.5)
+            } else {
+                // Benefits list
+                VStack(spacing: 12) {
+                    FeatureRow(icon: "cloud.fill", text: "Cloud-KI für bessere Erkennung")
+                    FeatureRow(icon: "arrow.triangle.2.circlepath", text: "Daten geräteübergreifend sync")
+                    FeatureRow(icon: "lock.shield", text: "Sichere Apple-Anmeldung")
+                }
+                .padding(.horizontal, 32)
+            }
+
+            if let error = authManager.error {
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(Constants.Colors.danger)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+            }
 
             Spacer()
         }
