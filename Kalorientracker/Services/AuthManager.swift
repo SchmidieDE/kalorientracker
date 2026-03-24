@@ -37,24 +37,33 @@ final class AuthManager: ObservableObject {
                 return
             }
 
-            let email = appleIDCredential.email ?? defaults.string(forKey: "auth_email") ?? "apple@user"
+            // Apple only provides name/email on FIRST sign-in — save immediately
+            if let email = appleIDCredential.email {
+                defaults.set(email, forKey: "auth_email")
+            }
             let fullName = [appleIDCredential.fullName?.givenName, appleIDCredential.fullName?.familyName]
                 .compactMap { $0 }
                 .joined(separator: " ")
-            let displayName = fullName.isEmpty ? defaults.string(forKey: "auth_display_name") : fullName
+            if !fullName.isEmpty {
+                defaults.set(fullName, forKey: "auth_display_name")
+            }
 
             isLoading = true
             self.error = nil
 
             Task {
-                let token = await exchangeTokenWithSupabase(idToken: idToken, provider: "apple")
+                let result = await exchangeTokenWithSupabase(idToken: idToken, provider: "apple")
                 isLoading = false
-                if let token {
-                    let authUser = AuthUser(email: email, displayName: displayName, accessToken: token)
+                if let result {
+                    // Use email/name from Supabase response, fallback to saved values
+                    let email = result.email ?? defaults.string(forKey: "auth_email") ?? "Unbekannt"
+                    let displayName = result.displayName ?? defaults.string(forKey: "auth_display_name")
+
+                    let authUser = AuthUser(email: email, displayName: displayName, accessToken: result.token)
                     self.user = authUser
-                    defaults.set(token, forKey: "auth_access_token")
+                    defaults.set(result.token, forKey: "auth_access_token")
                     defaults.set(email, forKey: "auth_email")
-                    defaults.set(displayName, forKey: "auth_display_name")
+                    if let displayName { defaults.set(displayName, forKey: "auth_display_name") }
                 } else {
                     self.error = "Supabase-Anmeldung fehlgeschlagen"
                 }
@@ -74,7 +83,13 @@ final class AuthManager: ObservableObject {
         defaults.removeObject(forKey: "auth_display_name")
     }
 
-    private func exchangeTokenWithSupabase(idToken: String, provider: String) async -> String? {
+    private struct SupabaseAuthResult {
+        let token: String
+        let email: String?
+        let displayName: String?
+    }
+
+    private func exchangeTokenWithSupabase(idToken: String, provider: String) async -> SupabaseAuthResult? {
         guard let url = URL(string: "\(Constants.supabaseURL)/auth/v1/token?grant_type=id_token") else { return nil }
 
         var request = URLRequest(url: url)
@@ -92,7 +107,16 @@ final class AuthManager: ObservableObject {
                 return nil
             }
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-            return json?["access_token"] as? String
+            guard let token = json?["access_token"] as? String else { return nil }
+
+            // Extract user info from Supabase response
+            let userJson = json?["user"] as? [String: Any]
+            let email = userJson?["email"] as? String
+            let userMeta = userJson?["user_metadata"] as? [String: Any]
+            let displayName = userMeta?["full_name"] as? String
+                ?? userMeta?["name"] as? String
+
+            return SupabaseAuthResult(token: token, email: email, displayName: displayName)
         } catch {
             return nil
         }
