@@ -8,46 +8,65 @@ struct AnalysisResultCard: View {
     @State private var selectedAlternative: FoodAlternative?
     @State private var showCustomInput = false
     @State private var customName = ""
+    @State private var portionMultiplier: Double = 1.0
 
     private var isUncertain: Bool {
         result.confidence < 0.8 && !(result.alternatives ?? []).isEmpty
+    }
+
+    // Detect if drink based on portion description or name
+    private var isDrink: Bool {
+        let text = (result.portionDescription + " " + result.name).lowercased()
+        return text.contains("ml") || text.contains("liter") || text.contains("glas")
+            || text.contains("tasse") || text.contains("flasche") || text.contains("dose")
+            || text.contains("saft") || text.contains("milch") || text.contains("wasser")
+            || text.contains("cola") || text.contains("bier") || text.contains("wein")
+            || text.contains("kaffee") || text.contains("tee") || text.contains("smoothie")
+            || text.contains("schorle") || text.contains("limo") || text.contains("getränk")
     }
 
     private var activeName: String {
         if !customName.isEmpty { return customName }
         return selectedAlternative?.name ?? result.name
     }
-    private var activeCalories: Int { selectedAlternative?.calories ?? result.calories }
-    private var activeProtein: Double { selectedAlternative?.protein ?? result.protein }
-    private var activeCarbs: Double { selectedAlternative?.carbs ?? result.carbs }
-    private var activeFat: Double { selectedAlternative?.fat ?? result.fat }
+    private var baseCalories: Int { selectedAlternative?.calories ?? result.calories }
+    private var baseProtein: Double { selectedAlternative?.protein ?? result.protein }
+    private var baseCarbs: Double { selectedAlternative?.carbs ?? result.carbs }
+    private var baseFat: Double { selectedAlternative?.fat ?? result.fat }
+
+    private var activeCalories: Int { Int(Double(baseCalories) * portionMultiplier) }
+    private var activeProtein: Double { baseProtein * portionMultiplier }
+    private var activeCarbs: Double { baseCarbs * portionMultiplier }
+    private var activeFat: Double { baseFat * portionMultiplier }
+
     private var activeEmoji: String? {
         if selectedAlternative != nil { return selectedAlternative?.emoji }
         return result.emoji
     }
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 12) {
             // Emoji
             if let emoji = activeEmoji, !emoji.isEmpty {
                 Text(emoji)
-                    .font(.system(size: 40))
+                    .font(.system(size: 36))
             }
 
             // Name
             Text(activeName)
-                .font(.title3.bold())
+                .font(.headline)
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
+                .frame(maxWidth: .infinity)
 
             // Calories
-            VStack(spacing: 2) {
+            VStack(spacing: 1) {
                 Text("\(activeCalories)")
-                    .font(.system(size: 40, weight: .heavy, design: .rounded))
+                    .font(.system(size: 36, weight: .heavy, design: .rounded))
                     .foregroundStyle(Constants.Colors.accentGradient)
                 Text("kcal")
-                    .font(.caption.weight(.medium))
+                    .font(.caption2.weight(.medium))
                     .foregroundStyle(Constants.Colors.textSecondary)
             }
 
@@ -64,7 +83,7 @@ struct AnalysisResultCard: View {
             }
 
             // Macros
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 MacroPillCompact(label: "Prot.", value: activeProtein, color: Constants.Colors.proteinColor)
                 MacroPillCompact(label: "Carbs", value: activeCarbs, color: Constants.Colors.carbsColor)
                 MacroPillCompact(label: "Fett", value: activeFat, color: Constants.Colors.fatColor)
@@ -81,6 +100,11 @@ struct AnalysisResultCard: View {
                 .foregroundStyle(Constants.Colors.textSecondary)
             }
 
+            // Drink amount slider
+            if isDrink {
+                drinkSlider
+            }
+
             // Alternatives
             if isUncertain {
                 alternativesSection
@@ -95,8 +119,9 @@ struct AnalysisResultCard: View {
                     Text(suggestion)
                         .font(.caption2)
                         .foregroundStyle(.white.opacity(0.8))
-                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(10)
                 .background(Constants.Colors.warning.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -112,6 +137,7 @@ struct AnalysisResultCard: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity)
         .padding(16)
         .glassCard()
     }
@@ -125,11 +151,82 @@ struct AnalysisResultCard: View {
             carbs: activeCarbs,
             fat: activeFat,
             confidence: selectedAlternative != nil || !customName.isEmpty ? 1.0 : result.confidence,
-            portionDescription: result.portionDescription,
+            portionDescription: portionMultiplier != 1.0 ? "\(Int(portionMultiplier * 100))% von \(result.portionDescription)" : result.portionDescription,
             suggestions: result.suggestions,
             emoji: activeEmoji,
             alternatives: nil
         )
+    }
+
+    // MARK: - Drink Slider
+
+    @ViewBuilder
+    private var drinkSlider: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Text("Menge anpassen")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.white)
+                Spacer()
+                Text(drinkAmountLabel)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Constants.Colors.gradientStart)
+            }
+
+            // Quick buttons
+            HStack(spacing: 6) {
+                ForEach([0.25, 0.5, 1.0, 1.5, 2.0], id: \.self) { mult in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) { portionMultiplier = mult }
+                    } label: {
+                        Text(drinkLabel(for: mult))
+                            .font(.caption2.weight(.medium))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
+                            .foregroundStyle(portionMultiplier == mult ? .white : Constants.Colors.textSecondary)
+                            .background(portionMultiplier == mult ? AnyShapeStyle(Constants.Colors.accentGradient) : AnyShapeStyle(Constants.Colors.surface))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+            }
+
+            Slider(value: $portionMultiplier, in: 0.1...3.0, step: 0.1)
+                .tint(Constants.Colors.gradientStart)
+        }
+        .padding(10)
+        .background(Constants.Colors.surface.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    private var drinkAmountLabel: String {
+        // Try to extract ml from portion description
+        let text = result.portionDescription.lowercased()
+        if let range = text.range(of: "\\d+\\s*ml", options: .regularExpression) {
+            let mlStr = text[range].filter { $0.isNumber }
+            if let ml = Int(mlStr) {
+                return "\(Int(Double(ml) * portionMultiplier)) ml"
+            }
+        }
+        if text.contains("liter") || text.contains("1 l") {
+            return "\(Int(1000 * portionMultiplier)) ml"
+        }
+        return "\(Int(portionMultiplier * 100))%"
+    }
+
+    private func drinkLabel(for mult: Double) -> String {
+        let text = result.portionDescription.lowercased()
+        if let range = text.range(of: "\\d+\\s*ml", options: .regularExpression) {
+            let mlStr = text[range].filter { $0.isNumber }
+            if let ml = Int(mlStr) {
+                let amount = Int(Double(ml) * mult)
+                return amount >= 1000 ? "\(amount/1000)L" : "\(amount)ml"
+            }
+        }
+        if text.contains("liter") || text.contains("1 l") {
+            let amount = Int(1000 * mult)
+            return amount >= 1000 ? "\(amount/1000)L" : "\(amount)ml"
+        }
+        return "\(Int(mult * 100))%"
     }
 
     // MARK: - Alternatives

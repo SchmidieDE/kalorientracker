@@ -27,7 +27,7 @@ struct PhotoReviewView: View {
                 .overlay(Color.black.opacity(0.5))
                 .blur(radius: result != nil ? 8 : 0)
 
-            VStack {
+            VStack(spacing: 0) {
                 // Top bar
                 HStack {
                     Button {
@@ -55,7 +55,8 @@ struct PhotoReviewView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(Capsule())
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
 
                 Spacer()
 
@@ -65,7 +66,6 @@ struct PhotoReviewView: View {
                         .padding()
                         .transition(.opacity)
                 } else if let error = analyzer.lastError {
-                    Spacer()
                     VStack(spacing: 16) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.largeTitle)
@@ -78,17 +78,16 @@ struct PhotoReviewView: View {
                         GradientButton("Nochmal versuchen", icon: "arrow.clockwise") {
                             startAnalysis()
                         }
-                        .padding(.horizontal, 40)
                         SecondaryButton(title: "Abbrechen") {
                             dismiss()
                         }
-                        .padding(.horizontal, 40)
                     }
-                    .padding()
+                    .padding(20)
                     .glassCard()
-                    .padding(.horizontal)
+                    .padding(.horizontal, 16)
                     .padding(.bottom, 16)
                 } else if let result {
+                    // Result card — bottom aligned, scrollable if tall
                     ScrollView(.vertical, showsIndicators: false) {
                         AnalysisResultCard(result: result, onSave: { resolvedResult, mealCategory in
                             let impact = UINotificationFeedbackGenerator()
@@ -97,9 +96,10 @@ struct PhotoReviewView: View {
                         }, onDiscard: {
                             dismiss()
                         })
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
                     }
+                    .frame(maxHeight: UIScreen.main.bounds.height * 0.65)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
