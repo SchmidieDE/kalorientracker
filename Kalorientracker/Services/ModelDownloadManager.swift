@@ -273,7 +273,7 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         // Check HTTP status — reject non-200 responses (e.g. 404 saved as file)
-        if let httpResponse = downloadTask.response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+        if let httpResponse = downloadTask.response as? HTTPURLResponse, httpResponse.statusCode != 200 && httpResponse.statusCode != 206 {
             Task { @MainActor in
                 self.manager?.handleCompletion(tempURL: nil, error: NSError(
                     domain: "ModelDownload",
