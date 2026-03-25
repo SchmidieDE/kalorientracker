@@ -136,26 +136,22 @@ app.post('/api/analyze', async (req, res) => {
     const defaultPrompt = `Du bist ein erfahrener Ernährungsberater und Lebensmittelexperte.
 Analysiere das Foto und identifiziere das Essen/Getränk.
 
-WICHTIG: Nutze die Google-Suche um die EXAKTEN Nährwerte des Produkts zu finden!
-Wenn du eine Marke oder ein Produkt erkennst (z.B. "Müllermilch Banane", "Weihenstephan Milch 1.5%"),
-dann suche nach den offiziellen Nährwertangaben des Herstellers und verwende diese STATT zu schätzen.
-
 Aufgabe:
-1. Identifiziere das Lebensmittel auf dem Foto
-2. Wenn es ein Markenprodukt ist: SUCHE die exakten Nährwerte im Internet
-3. Wenn es kein Markenprodukt ist (z.B. ein Teller Pasta): Schätze basierend auf der Portion
-4. Wenn du dir NICHT sicher bist (confidence < 0.8), gib 2-3 Alternativen an
-5. Gib die erkannte Marke und das Produkt an
+1. Identifiziere ALLE sichtbaren Lebensmittel auf dem Foto
+2. Schätze die Portionsgröße basierend auf visuellen Hinweisen
+3. Berechne die Nährwerte für die GESAMTE sichtbare Portion
+4. Wenn du eine Marke erkennst, gib detectedBrand und detectedProduct an
+5. Wenn du dir NICHT sicher bist (confidence < 0.8), gib 2-3 Alternativen an
 
 Regeln:
-- Nährwerte pro sichtbare Portion (NICHT pro 100g, es sei denn die ganze Packung ist sichtbar)
+- Nährwerte pro sichtbare Portion
 - Name auf Deutsch
-- Bei Markenprodukten: confidence hoch setzen wenn Nährwerte aus offizieller Quelle
+- Confidence (0.0-1.0) = wie sicher du bei der Identifikation bist
 - Wenn kein Essen: confidence=0.0, calories=0
-- "detectedBrand": Marke/Hersteller wenn erkannt
-- "detectedProduct": Vollständiger Produktname wenn erkannt
+- Bei niedriger Confidence: alternatives mit 2-3 Möglichkeiten
+- Bei hoher Confidence: alternatives = leeres Array []
 
-Antworte NUR im JSON-Format.`;
+Antworte NUR im geforderten JSON-Format.`;
 
     const body = {
       contents: [{
@@ -164,11 +160,39 @@ Antworte NUR im JSON-Format.`;
           { inline_data: { mime_type: 'image/jpeg', data: image } }
         ]
       }],
-      tools: [{
-        google_search: {}
-      }],
       generationConfig: {
-        temperature: 0.2,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            name: { type: 'STRING' },
+            calories: { type: 'INTEGER' },
+            protein: { type: 'NUMBER' },
+            carbs: { type: 'NUMBER' },
+            fat: { type: 'NUMBER' },
+            confidence: { type: 'NUMBER' },
+            portionDescription: { type: 'STRING' },
+            emoji: { type: 'STRING' },
+            detectedBrand: { type: 'STRING' },
+            detectedProduct: { type: 'STRING' },
+            alternatives: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  name: { type: 'STRING' },
+                  calories: { type: 'INTEGER' },
+                  protein: { type: 'NUMBER' },
+                  carbs: { type: 'NUMBER' },
+                  fat: { type: 'NUMBER' },
+                  emoji: { type: 'STRING' }
+                },
+                required: ['name', 'calories', 'protein', 'carbs', 'fat']
+              }
+            }
+          },
+          required: ['name', 'calories', 'protein', 'carbs', 'fat', 'confidence', 'portionDescription']
+        }
       }
     };
 
@@ -186,44 +210,17 @@ Antworte NUR im JSON-Format.`;
 
     const data = await response.json();
     const candidates = data.candidates;
-    if (!candidates || !candidates[0]?.content?.parts) {
+    if (!candidates || !candidates[0]?.content?.parts?.[0]?.text) {
       return res.status(502).json({ error: 'Keine Analyse-Ergebnisse' });
     }
 
-    // Extract text from all parts (grounding may split across parts)
-    const allText = candidates[0].content.parts
-      .filter(p => p.text)
-      .map(p => p.text)
-      .join('');
-
-    // Extract JSON from response (may contain markdown code blocks)
-    let resultText = allText;
-    const jsonMatch = allText.match(/```json\s*([\s\S]*?)```/) || allText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      resultText = jsonMatch[1] || jsonMatch[0];
-    }
-
+    const resultText = candidates[0].content.parts[0].text;
     let result;
     try {
       result = JSON.parse(resultText);
     } catch (e) {
-      console.error('JSON parse error, raw text:', allText.substring(0, 500));
+      console.error('JSON parse error:', resultText.substring(0, 200));
       return res.status(502).json({ error: 'Analyse-Format ungültig' });
-    }
-
-    // Ensure required fields
-    result.name = result.name || 'Unbekannt';
-    result.calories = parseInt(result.calories) || 0;
-    result.protein = parseFloat(result.protein) || 0;
-    result.carbs = parseFloat(result.carbs) || 0;
-    result.fat = parseFloat(result.fat) || 0;
-    result.confidence = parseFloat(result.confidence) || 0.5;
-    result.portionDescription = result.portionDescription || '';
-
-    // Log if grounding was used
-    const grounding = data.candidates[0]?.groundingMetadata;
-    if (grounding?.searchEntryPoint) {
-      console.log('🔍 Google Search grounding used for:', result.detectedProduct || result.name);
     }
 
     // === DB ENRICHMENT: Try to find exact product in database ===
