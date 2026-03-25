@@ -93,17 +93,22 @@ final class ModelDownloadManager: NSObject, ObservableObject {
         error = nil
         downloadPhase = .model
         downloadedBytes = 0
-        totalBytes = Constants.localModelSize
+        // Total = model + mmproj combined
+        totalBytes = Constants.localModelSize + 700_000_000
         speedBytesPerSec = 0
+        phase1Bytes = 0
 
         let mmprojDest = mmprojPath
         downloadFile(url: Constants.localModelURL, destination: modelPath) { [weak self] success in
             Task { @MainActor [weak self] in
-                guard let self, success else { return }
+                guard let self else {  return }
+                if !success {
+                    self.isDownloading = false
+                    return
+                }
+                // Save phase 1 bytes, continue to phase 2
+                self.phase1Bytes = self.downloadedBytes
                 self.downloadPhase = .mmproj
-                self.progress = 0
-                self.downloadedBytes = 0
-                self.totalBytes = 0
                 self.speedBytesPerSec = 0
 
                 self.downloadFile(url: Constants.localMmprojURL, destination: mmprojDest) { [weak self] success in
@@ -119,6 +124,9 @@ final class ModelDownloadManager: NSObject, ObservableObject {
             }
         }
     }
+
+    /// Bytes downloaded in phase 1 (model), used to keep total progress continuous
+    private var phase1Bytes: Int64 = 0
 
     private func downloadFile(url urlString: String, destination: URL, completion: @escaping @Sendable (Bool) -> Void) {
         guard let url = URL(string: urlString) else {
@@ -172,22 +180,31 @@ final class ModelDownloadManager: NSObject, ObservableObject {
 
     // Called by delegate
     fileprivate func handleProgress(bytesWritten: Int64, totalWritten: Int64, totalExpected: Int64) {
-        downloadedBytes = totalWritten
-        if totalExpected > 0 {
-            totalBytes = totalExpected
-            progress = Double(totalWritten) / Double(totalExpected)
+        // Accumulate bytes from both phases for continuous progress
+        let combinedDownloaded = phase1Bytes + totalWritten
+        downloadedBytes = combinedDownloaded
+
+        // Update total if we got real content-length
+        if totalExpected > 0 && downloadPhase == .model {
+            totalBytes = totalExpected + 700_000_000 // model + estimated mmproj
+        } else if totalExpected > 0 && downloadPhase == .mmproj {
+            totalBytes = phase1Bytes + totalExpected
+        }
+
+        if totalBytes > 0 {
+            progress = Double(combinedDownloaded) / Double(totalBytes)
         }
 
         // Calculate speed every 2 seconds
         let now = Date()
         if let lastUpdate = lastSpeedUpdate, now.timeIntervalSince(lastUpdate) >= 2.0 {
-            let byteDiff = totalWritten - lastSpeedBytes
+            let byteDiff = combinedDownloaded - lastSpeedBytes
             let timeDiff = now.timeIntervalSince(lastUpdate)
             if timeDiff > 0 {
                 speedBytesPerSec = Double(byteDiff) / timeDiff
             }
             lastSpeedUpdate = now
-            lastSpeedBytes = totalWritten
+            lastSpeedBytes = combinedDownloaded
         }
     }
 
@@ -223,14 +240,14 @@ final class ModelDownloadManager: NSObject, ObservableObject {
         let dlMB = Double(downloadedBytes) / 1_000_000
         let totalMB = Double(totalBytes) / 1_000_000
         let speedMB = speedBytesPerSec / 1_000_000
-        let phase = downloadPhase.rawValue
+        let step = downloadPhase == .model ? "1/2" : "2/2"
 
         var text: String
         if totalMB > 0 {
             let pct = Int(progress * 100)
-            text = String(format: "%@ — %.0f / %.0f MB (%d%%)", phase, dlMB, totalMB, pct)
+            text = String(format: "(%@) %.0f / %.0f MB (%d%%)", step, dlMB, totalMB, pct)
         } else {
-            text = String(format: "%@ — %.0f MB", phase, dlMB)
+            text = String(format: "(%@) %.0f MB", step, dlMB)
         }
 
         if speedMB > 0.01 {
