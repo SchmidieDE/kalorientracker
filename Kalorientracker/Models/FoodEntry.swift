@@ -22,6 +22,7 @@ final class FoodEntry {
     var analysisSource: String = AnalysisSource.cloud.rawValue
     var mealCategoryRaw: String = MealCategory.fromCurrentTime().rawValue
     var isFavorite: Bool = false
+    var isSynced: Bool = false
 
     @Attribute(.externalStorage)
     var imageData: Data?

@@ -31,6 +31,7 @@
 		AD83BA84ED3085CD753F349A /* LocalInferenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75689ACB455D5B5F40D7C244 /* LocalInferenceService.swift */; };
 		B1A2BA8678763824AADC7A1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3115C6DF288D89B8962CE709 /* Assets.xcassets */; };
 		B1F2A04ABC4B794043C7DD07 /* NutritionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAEF80A4B909B87AD626AB2 /* NutritionResult.swift */; };
+		B4398C6455C09A1A1A9F5BB3 /* SyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12541C821AE14F60E39492B /* SyncService.swift */; };
 		B6E394D5693AEB3AB2CEAC4D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17DE1E3F14D6665562A5B6F /* ContentView.swift */; };
 		B7FF968C4D5003C577D39943 /* FoodEntryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C86DA50F9C50353FA58B8B8 /* FoodEntryRow.swift */; };
 		BB3F2495EE1B0D92CE78E0A9 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB62296B414BDD585CB9BB6 /* GlassCard.swift */; };
@@ -79,6 +80,7 @@
 		E434795CB2BD97F6E4C23CBD /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		E9576F30627FB01B1888FEB3 /* MealCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealCategory.swift; sourceTree = "<group>"; };
 		EEF3086F0C9B2994A2A8B69C /* Kalorientracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Kalorientracker.entitlements; sourceTree = "<group>"; };
+		F12541C821AE14F60E39492B /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
 		F53E68E278CE4BBA41F6D137 /* AddFoodSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFoodSheet.swift; sourceTree = "<group>"; };
 		FD3665C4F6762CF0FA87B6FC /* AnalysisResultCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisResultCard.swift; sourceTree = "<group>"; };
 		FDE5712B6F95DEBB8C7A8841 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 				E42DA6DFFC778D4B2080138B /* GeminiService.swift */,
 				75689ACB455D5B5F40D7C244 /* LocalInferenceService.swift */,
 				501FFA2FC8631AEFB0E8AFD8 /* ModelDownloadManager.swift */,
+				F12541C821AE14F60E39492B /* SyncService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -334,6 +337,7 @@
 				BC8578FEE7E08097D8847950 /* PhotoReviewView.swift in Sources */,
 				3561E25F357D3FFB04EC6141 /* ProfileView.swift in Sources */,
 				32772A983E392ADE04E93483 /* StatisticsView.swift in Sources */,
+				B4398C6455C09A1A1A9F5BB3 /* SyncService.swift in Sources */,
 				390533B144F8D67861EE3F5A /* ToastView.swift in Sources */,
 				7372F37E4CAD4A35FB698AB1 /* TodayView.swift in Sources */,
 				54E59CAD3468EED48C93B53C /* UserProfile.swift in Sources */,

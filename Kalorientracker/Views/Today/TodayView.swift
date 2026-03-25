@@ -13,6 +13,8 @@ struct TodayView: View {
     }
 
     @Query private var profiles: [UserProfile]
+    @EnvironmentObject var authManager: AuthManager
+    @EnvironmentObject var syncService: SyncService
     @StateObject private var analyzer = FoodAnalyzer()
     @State private var showCamera = false
     @State private var capturedImage: UIImage?
@@ -192,7 +194,7 @@ struct TodayView: View {
                         mealCategory: mealCategory
                     )
                     entry.isFavorite = true
-                    modelContext.insert(entry)
+                    saveAndSync(entry)
                     showResult = false
                     ToastManager.shared.show("Gespeichert & zu Favoriten hinzugefügt", icon: "star.fill", style: .success)
                 }
@@ -200,13 +202,13 @@ struct TodayView: View {
         }
         .sheet(isPresented: $showManualEntry) {
             ManualFoodEntrySheet { entry in
-                modelContext.insert(entry)
+                saveAndSync(entry)
                 ToastManager.shared.show("Eintrag gespeichert")
             }
         }
         .sheet(isPresented: $showFavorites) {
             FavoritesSheet { entry in
-                modelContext.insert(entry)
+                saveAndSync(entry)
                 ToastManager.shared.show("Eintrag gespeichert")
             }
         }
@@ -380,6 +382,13 @@ struct TodayView: View {
 
     // MARK: - Actions
 
+    private func saveAndSync(_ entry: FoodEntry) {
+        modelContext.insert(entry)
+        if let token = authManager.accessToken {
+            Task { await syncService.uploadEntry(entry, accessToken: token) }
+        }
+    }
+
     private func duplicateEntry(_ entry: FoodEntry) {
         let newEntry = FoodEntry(
             name: entry.name,
@@ -395,7 +404,7 @@ struct TodayView: View {
             analysisSource: entry.source,
             mealCategory: MealCategory.fromCurrentTime()
         )
-        modelContext.insert(newEntry)
+        saveAndSync(newEntry)
         ToastManager.shared.show("Eintrag dupliziert")
     }
 }

@@ -4,11 +4,13 @@ import SwiftData
 @main
 struct KalorientrackerApp: App {
     @StateObject private var authManager = AuthManager()
+    @StateObject private var syncService = SyncService()
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(authManager)
+                .environmentObject(syncService)
                 .preferredColorScheme(.dark)
         }
         .modelContainer(for: [FoodEntry.self, UserProfile.self])
@@ -17,6 +19,8 @@ struct KalorientrackerApp: App {
 
 struct RootView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var authManager: AuthManager
+    @EnvironmentObject var syncService: SyncService
     @Query private var profiles: [UserProfile]
 
     private var needsOnboarding: Bool {
@@ -25,10 +29,18 @@ struct RootView: View {
     }
 
     var body: some View {
-        if needsOnboarding {
-            OnboardingView()
-        } else {
-            ContentView()
+        Group {
+            if needsOnboarding {
+                OnboardingView()
+            } else {
+                ContentView()
+            }
+        }
+        .task {
+            // Sync on app start if logged in
+            if let token = authManager.accessToken {
+                await syncService.pullEntries(accessToken: token, modelContext: modelContext)
+            }
         }
     }
 }
