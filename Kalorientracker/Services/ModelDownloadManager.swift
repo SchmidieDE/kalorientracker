@@ -1,4 +1,6 @@
 import Foundation
+import Network
+import UserNotifications
 
 @MainActor
 final class ModelDownloadManager: NSObject, ObservableObject {
@@ -13,6 +15,7 @@ final class ModelDownloadManager: NSObject, ObservableObject {
     @Published var downloadPhase: DownloadPhase = .model
     @Published var speedBytesPerSec: Double = 0
     @Published var storageWarning: String?
+    @Published var showCellularAlert = false
 
     fileprivate var resumeData: Data?
 
@@ -22,16 +25,25 @@ final class ModelDownloadManager: NSObject, ObservableObject {
     }
 
     private var downloadTask: URLSessionDownloadTask?
-    private var session: URLSession?
+    private var bgSession: URLSession?
     private var currentDestination: URL?
     private var currentCompletion: (@Sendable (Bool) -> Void)?
     private var downloadStartTime: Date?
     private var lastSpeedUpdate: Date?
     private var lastSpeedBytes: Int64 = 0
+    private var phase1Bytes: Int64 = 0
+    private var lastNotifiedPercent: Int = 0
+
+    /// Background session completion handler (set by AppDelegate)
+    static var backgroundCompletionHandler: (() -> Void)?
+
+    private static let bgSessionID = "com.philippschmid.Kalorientracker.model-download"
 
     override init() {
         super.init()
         isModelAvailable = bothFilesExist()
+        requestNotificationPermission()
+        reconnectBackgroundSession()
     }
 
     // MARK: - Paths
@@ -40,14 +52,8 @@ final class ModelDownloadManager: NSObject, ObservableObject {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
 
-    var modelPath: URL {
-        documentsDir.appendingPathComponent(Constants.localModelName)
-    }
-
-    var mmprojPath: URL {
-        documentsDir.appendingPathComponent(Constants.localMmprojName)
-    }
-
+    var modelPath: URL { documentsDir.appendingPathComponent(Constants.localModelName) }
+    var mmprojPath: URL { documentsDir.appendingPathComponent(Constants.localMmprojName) }
     var resolvedModelPath: URL { modelPath }
     var resolvedMmprojPath: URL { mmprojPath }
 
@@ -58,9 +64,8 @@ final class ModelDownloadManager: NSObject, ObservableObject {
             && FileManager.default.fileExists(atPath: mmprojPath.path)
     }
 
-    // MARK: - Download
+    // MARK: - Storage check
 
-    /// Check available disk space in bytes
     private var availableStorage: Int64 {
         let home = URL(fileURLWithPath: NSHomeDirectory())
         guard let values = try? home.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]),
@@ -68,24 +73,45 @@ final class ModelDownloadManager: NSObject, ObservableObject {
         return capacity
     }
 
-    func startDownload() {
+    // MARK: - Network check
+
+    var isOnCellular: Bool {
+        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&ifaddr) == 0, let first = ifaddr else { return false }
+        defer { freeifaddrs(ifaddr) }
+        for ptr in sequence(first: first, next: { $0.pointee.ifa_next }) {
+            let name = String(cString: ptr.pointee.ifa_name)
+            if name == "pdp_ip0" || name == "pdp_ip1" { return true }
+        }
+        return false
+    }
+
+    // MARK: - Download
+
+    func startDownload(allowCellular: Bool = false) {
         guard !isDownloading else { return }
 
-        // Check disk space
-        let needed = Constants.localModelSize + 700_000_000 // model + mmproj
+        // Cellular check
+        if !allowCellular && isOnCellular {
+            showCellularAlert = true
+            return
+        }
+
+        // Storage check
+        let needed = Constants.localModelSize + 700_000_000
         let available = availableStorage
         storageWarning = nil
 
-        if available < needed + 500_000_000 { // less than 500MB buffer
+        if available < needed + 500_000_000 {
             let availGB = String(format: "%.1f", Double(available) / 1_000_000_000)
             let needGB = String(format: "%.1f", Double(needed) / 1_000_000_000)
             error = "Nicht genug Speicherplatz\n(\(availGB) GB frei, \(needGB) GB benötigt)"
             return
         }
 
-        if available < needed + 5_000_000_000 { // less than 5GB remaining after download
+        if available < needed + 5_000_000_000 {
             let remainGB = String(format: "%.1f", Double(available - needed) / 1_000_000_000)
-            storageWarning = "Achtung: Nach dem Download nur noch ~\(remainGB) GB frei"
+            storageWarning = "Nach dem Download nur noch ~\(remainGB) GB frei"
         }
 
         isDownloading = true
@@ -93,20 +119,19 @@ final class ModelDownloadManager: NSObject, ObservableObject {
         error = nil
         downloadPhase = .model
         downloadedBytes = 0
-        // Total = model + mmproj combined
         totalBytes = Constants.localModelSize + 700_000_000
         speedBytesPerSec = 0
         phase1Bytes = 0
+        lastNotifiedPercent = 0
 
         let mmprojDest = mmprojPath
         downloadFile(url: Constants.localModelURL, destination: modelPath) { [weak self] success in
             Task { @MainActor [weak self] in
-                guard let self else {  return }
+                guard let self else { return }
                 if !success {
                     self.isDownloading = false
                     return
                 }
-                // Save phase 1 bytes, continue to phase 2
                 self.phase1Bytes = self.downloadedBytes
                 self.downloadPhase = .mmproj
                 self.speedBytesPerSec = 0
@@ -118,15 +143,13 @@ final class ModelDownloadManager: NSObject, ObservableObject {
                         if success {
                             self.isModelAvailable = true
                             self.progress = 1.0
+                            self.sendNotification(title: "Download abgeschlossen", body: "Das On-Device Modell ist bereit!")
                         }
                     }
                 }
             }
         }
     }
-
-    /// Bytes downloaded in phase 1 (model), used to keep total progress continuous
-    private var phase1Bytes: Int64 = 0
 
     private func downloadFile(url urlString: String, destination: URL, completion: @escaping @Sendable (Bool) -> Void) {
         guard let url = URL(string: urlString) else {
@@ -140,23 +163,36 @@ final class ModelDownloadManager: NSObject, ObservableObject {
         currentCompletion = completion
         downloadStartTime = Date()
         lastSpeedUpdate = Date()
-        lastSpeedBytes = 0
+        lastSpeedBytes = phase1Bytes
 
-        // Use delegate-based session for reliable progress
-        let config = URLSessionConfiguration.default
-        config.timeoutIntervalForResource = 3600
-        session = URLSession(configuration: config, delegate: DownloadDelegate(manager: self), delegateQueue: .main)
+        // Background session — continues even when app is in background
+        let config = URLSessionConfiguration.background(withIdentifier: Self.bgSessionID + ".\(downloadPhase.rawValue)")
+        config.timeoutIntervalForResource = 7200 // 2 hours
+        config.isDiscretionary = false // don't delay
+        config.sessionSendsLaunchEvents = true // wake app on completion
+        bgSession = URLSession(configuration: config, delegate: DownloadDelegate(manager: self), delegateQueue: .main)
 
-        // Resume if we have resume data from a previous attempt
         let task: URLSessionDownloadTask
         if let resumeData {
-            task = session!.downloadTask(withResumeData: resumeData)
+            task = bgSession!.downloadTask(withResumeData: resumeData)
             self.resumeData = nil
         } else {
-            task = session!.downloadTask(with: url)
+            task = bgSession!.downloadTask(with: url)
         }
         task.resume()
         downloadTask = task
+    }
+
+    /// Reconnect to existing background session (after app relaunch)
+    private func reconnectBackgroundSession() {
+        let configs = [
+            Self.bgSessionID + ".Modell",
+            Self.bgSessionID + ".Vision-Projektor"
+        ]
+        for id in configs {
+            let config = URLSessionConfiguration.background(withIdentifier: id)
+            let _ = URLSession(configuration: config, delegate: DownloadDelegate(manager: self), delegateQueue: .main)
+        }
     }
 
     func cancelDownload() {
@@ -165,7 +201,7 @@ final class ModelDownloadManager: NSObject, ObservableObject {
                 self?.resumeData = data
             }
         })
-        session?.finishTasksAndInvalidate()
+        bgSession?.finishTasksAndInvalidate()
         isDownloading = false
         progress = 0
         downloadedBytes = 0
@@ -178,15 +214,14 @@ final class ModelDownloadManager: NSObject, ObservableObject {
         isModelAvailable = false
     }
 
-    // Called by delegate
+    // MARK: - Delegate callbacks
+
     fileprivate func handleProgress(bytesWritten: Int64, totalWritten: Int64, totalExpected: Int64) {
-        // Accumulate bytes from both phases for continuous progress
         let combinedDownloaded = phase1Bytes + totalWritten
         downloadedBytes = combinedDownloaded
 
-        // Update total if we got real content-length
         if totalExpected > 0 && downloadPhase == .model {
-            totalBytes = totalExpected + 700_000_000 // model + estimated mmproj
+            totalBytes = totalExpected + 700_000_000
         } else if totalExpected > 0 && downloadPhase == .mmproj {
             totalBytes = phase1Bytes + totalExpected
         }
@@ -195,16 +230,21 @@ final class ModelDownloadManager: NSObject, ObservableObject {
             progress = Double(combinedDownloaded) / Double(totalBytes)
         }
 
-        // Calculate speed every 2 seconds
+        // Speed every 2 seconds
         let now = Date()
         if let lastUpdate = lastSpeedUpdate, now.timeIntervalSince(lastUpdate) >= 2.0 {
             let byteDiff = combinedDownloaded - lastSpeedBytes
             let timeDiff = now.timeIntervalSince(lastUpdate)
-            if timeDiff > 0 {
-                speedBytesPerSec = Double(byteDiff) / timeDiff
-            }
+            if timeDiff > 0 { speedBytesPerSec = Double(byteDiff) / timeDiff }
             lastSpeedUpdate = now
             lastSpeedBytes = combinedDownloaded
+        }
+
+        // Notify at 25%, 50%, 75%
+        let pct = Int(progress * 100)
+        if pct >= lastNotifiedPercent + 25 {
+            lastNotifiedPercent = (pct / 25) * 25
+            sendNotification(title: "Model-Download", body: "\(lastNotifiedPercent)% heruntergeladen...")
         }
     }
 
@@ -234,7 +274,28 @@ final class ModelDownloadManager: NSObject, ObservableObject {
             self.isDownloading = false
             currentCompletion?(false)
         }
+
+        // Call background completion handler
+        Self.backgroundCompletionHandler?()
+        Self.backgroundCompletionHandler = nil
     }
+
+    // MARK: - Notifications
+
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+    }
+
+    private func sendNotification(title: String, body: String) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    // MARK: - Formatted strings
 
     var formattedProgress: String {
         let dlMB = Double(downloadedBytes) / 1_000_000
@@ -273,7 +334,7 @@ final class ModelDownloadManager: NSObject, ObservableObject {
     }
 }
 
-// MARK: - URLSession Delegate (for reliable download progress)
+// MARK: - URLSession Delegate
 
 private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
     private weak var manager: ModelDownloadManager?
@@ -289,32 +350,25 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
     }
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        // Check HTTP status — reject non-200 responses (e.g. 404 saved as file)
         if let httpResponse = downloadTask.response as? HTTPURLResponse, httpResponse.statusCode != 200 && httpResponse.statusCode != 206 {
             Task { @MainActor in
                 self.manager?.handleCompletion(tempURL: nil, error: NSError(
-                    domain: "ModelDownload",
-                    code: httpResponse.statusCode,
-                    userInfo: [NSLocalizedDescriptionKey: "Download fehlgeschlagen\n(Server-Fehler \(httpResponse.statusCode))"]
-                ))
+                    domain: "ModelDownload", code: httpResponse.statusCode,
+                    userInfo: [NSLocalizedDescriptionKey: "Server-Fehler \(httpResponse.statusCode)"]))
             }
             return
         }
 
-        // Check file size — GGUF must be > 100MB
         let fileSize = (try? FileManager.default.attributesOfItem(atPath: location.path)[.size] as? Int64) ?? 0
         if fileSize < 100_000_000 {
             Task { @MainActor in
                 self.manager?.handleCompletion(tempURL: nil, error: NSError(
-                    domain: "ModelDownload",
-                    code: -1,
-                    userInfo: [NSLocalizedDescriptionKey: "Download ungültig\n(Datei zu klein: \(fileSize / 1_000_000) MB)"]
-                ))
+                    domain: "ModelDownload", code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "Datei zu klein (\(fileSize / 1_000_000) MB)"]))
             }
             return
         }
 
-        // Copy to temp because the file gets deleted after this callback
         let tempDir = FileManager.default.temporaryDirectory
         let tempFile = tempDir.appendingPathComponent(UUID().uuidString + ".gguf")
         try? FileManager.default.copyItem(at: location, to: tempFile)
@@ -326,16 +380,19 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard let error else { return }
-        // Save resume data for network errors
         let nsError = error as NSError
         if let resumeData = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
-            Task { @MainActor in
-                self.manager?.resumeData = resumeData
-            }
+            Task { @MainActor in self.manager?.resumeData = resumeData }
         }
         if nsError.code == NSURLErrorCancelled { return }
+        Task { @MainActor in self.manager?.handleCompletion(tempURL: nil, error: error) }
+    }
+
+    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        // Background session completed
         Task { @MainActor in
-            self.manager?.handleCompletion(tempURL: nil, error: error)
+            ModelDownloadManager.backgroundCompletionHandler?()
+            ModelDownloadManager.backgroundCompletionHandler = nil
         }
     }
 }

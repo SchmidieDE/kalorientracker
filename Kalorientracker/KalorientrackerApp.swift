@@ -1,8 +1,16 @@
 import SwiftUI
 import SwiftData
+import UIKit
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        ModelDownloadManager.backgroundCompletionHandler = completionHandler
+    }
+}
 
 @main
 struct KalorientrackerApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var authManager = AuthManager()
     @StateObject private var syncService = SyncService()
 

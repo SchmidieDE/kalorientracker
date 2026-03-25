@@ -259,6 +259,14 @@ struct ProfileView: View {
         .padding(20)
         .glassCard()
         .padding(.horizontal)
+        .alert("Download über Mobilfunk?", isPresented: $downloadManager.showCellularAlert) {
+            Button("Abbrechen", role: .cancel) {}
+            Button("Trotzdem laden (~1.9 GB)") {
+                downloadManager.startDownload(allowCellular: true)
+            }
+        } message: {
+            Text("Du bist nicht im WLAN. Der Download verbraucht ca. 1.9 GB Mobilfunkdaten.")
+        }
 
         // Goal selection
         VStack(alignment: .leading, spacing: 12) {
